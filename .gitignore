@@ -1,6 +1,7 @@
 ### OpenCV ignore ###
 opencv2.framework/
 OpenCVlibrary341/
+jniLibs/
 
 ### React Native Dependencies ### 
 # Xcode
