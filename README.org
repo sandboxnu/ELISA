@@ -28,6 +28,8 @@ while compensating for differences in lighting and camera.
 
 This branch of the repository has a cross-platform React Native application
 with some starter code.
+
+NOTE: current demo application present is reproduced from [[https://brainhub.eu/blog/opencv-react-native-image-processing/]]
 ** Module Flags
 This module provides no flags.
 
