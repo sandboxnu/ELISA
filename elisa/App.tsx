@@ -8,6 +8,18 @@
  * @format
  */
 
+import React, { Component } from 'react';
+import CameraScreen from './src/screens/CameraScreen';
+
+export default class App extends Component<Props> {
+  render() {
+    return (
+      <CameraScreen/>
+    );
+  }
+}
+
+/**
 import React from 'react';
 import {
   SafeAreaView,
@@ -116,3 +128,4 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+*/
