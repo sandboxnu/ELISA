@@ -24,6 +24,8 @@ measurements.
 It's able to scan a plate and record the RGB values of each individual vial
 while compensating for differences in lighting and camera.
 
+This iteration of the application has a native Android application with some starter
+code to work from.
 ** Module Flags
 This module provides no flags.
 
