@@ -1,3 +1,8 @@
+### OpenCV ignore ###
+opencv2.framework/
+OpenCVlibrary341/
+
+
 ### ANDROID APPLICATION IGNORE ###
 # Built application files
 *.apk
