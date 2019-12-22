@@ -2,6 +2,9 @@
 opencv2.framework/
 OpenCVlibrary341/
 jniLibs/
+OpenCV-android-sdk/
+openCVLibrary341/
+*opencv/
 
 ### React Native Dependencies ### 
 # Xcode

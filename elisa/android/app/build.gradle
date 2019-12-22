@@ -133,6 +133,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     splits {
         abi {
@@ -180,7 +181,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:+"
+    implementation project(path: ':openCVLibrary341')  // From node_modules
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

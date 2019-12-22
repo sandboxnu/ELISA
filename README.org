@@ -16,6 +16,7 @@
 - [[#questions-for-end-user][Questions (for end user)]]
 - [[#configuration][Configuration]]
   - [[#react-native-configuration][React Native Configuration]]
+  - [[#opencv-configuration][OpenCV Configuration]]
 - [[#troubleshooting][Troubleshooting]]
 
 * Description
@@ -104,5 +105,12 @@ npx react-native run-android
 
    Alternatively, we can press the green play button in Android Studio to run
    the project.
+** OpenCV Configuration
+The Android module should already be in the right place.
+Edit the build.gradle file in openCV to match the dependency versions of the
+build.gradle of the android project. (write a script to do this automatically)
+TODO update documentation of the java files in the project
+TODO patch up the java files in the project
+~npx react-native link~
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
