@@ -13,6 +13,7 @@
   - [[#read-vials][Read Vials]]
   - [[#normalize-color][Normalize Color]]
   - [[#feedback][Feedback]]
+- [[#questions-for-end-user][Questions (for end user)]]
 - [[#configuration][Configuration]]
 - [[#troubleshooting][Troubleshooting]]
 
@@ -52,9 +53,26 @@ application to view normalized pictures of plates and view the RGB readings as
 labels of some sort corresponding to each vial through the application.
 
 It would also be useful to store this information in a human-interpretable
-table, likely in .csv format, and to be able to back up and/or export this information.
-* Configuration
+table, likely in .csv format, and to be able to back up and/or export this
+information.
+* Questions (for end user)
+- How would you like the information displayed?
+  We should prepare several suggestions and diagrams for this when initially
+  meeting with the researcher. How they view the data for the readings is just
+  as important as their ability to record the readings through our application;
+  if they are not able to view the results, they have gotten nothing!
+- What information do you need?
+  e.g. RGB values, original image of the plate, normalized image of the plate
+- Will you be able to use the same smartphone for each reading?
+- Could this smartphone be an Android smartphone?
+  (We can develop a React Native cross-platform application or a native Android
+  application)
+- Will the lighting condition be consistent?
+  It's much more difficult to obtain consistent readings if we cannot rely upon
+  consistent lighting conditions. Normalizing the lighting is an interesting
+  problem, but may fall outside of the scope of this project.
+* TODO Configuration
 How to configure this module, including common problems and how to address them.
 
-* Troubleshooting
+* TODO Troubleshooting
 Common issues and their solution, or places to look for help.
