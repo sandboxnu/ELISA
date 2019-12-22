@@ -89,6 +89,18 @@ How to configure this module, including common problems and how to address them.
    b. Proceed to the software selection (click 'next') and select the Android
    Pie system image. This is necessary for compatibility with react native.
    d. Verify the configuration and you're done!
+6. Get this running!
+   First, open the android emulator we just created via the previous dialogue.
+   From the project's root:
+   #+begin_src sh
+npx react-native start
+   #+end_src
+   In a second terminal instance:
+   #+begin_src sh
+npx react-native run-android
+   #+end_src
 
+   Alternatively, we can press the green play button in Android Studio to run
+   the project.
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
