@@ -15,6 +15,7 @@
   - [[#feedback][Feedback]]
 - [[#questions-for-end-user][Questions (for end user)]]
 - [[#configuration][Configuration]]
+  - [[#react-native-configuration][React Native Configuration]]
 - [[#troubleshooting][Troubleshooting]]
 
 * Description
@@ -73,6 +74,21 @@ information.
   problem, but may fall outside of the scope of this project.
 * TODO Configuration
 How to configure this module, including common problems and how to address them.
+** React Native Configuration
+1. Install node, npm and yarn on your system.
+   For me, this was ~pacman -S node~ and ~npm install -g yarn~.
+2. Install react-native. ~yarn global add react-native~
+3. Install android studio. ~trizen android-studio~
+4. Install OpenJDK 8 and adb. ~pacman -S jre8-openjdk adb~
+5. Configure the emulator.
+   a. Open ELIZA/eliza/android in Android Studio.
+   b. Click on the icon depicting an android phone next to the android logo.
+   This is the Android AVD manager.
+   c. Select Create Virtual Device, then select the device to create. I went
+   with the Pixel 3; other devices are untested.
+   b. Proceed to the software selection (click 'next') and select the Android
+   Pie system image. This is necessary for compatibility with react native.
+   d. Verify the configuration and you're done!
 
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
