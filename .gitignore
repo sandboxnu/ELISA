@@ -1,7 +1,7 @@
 ### OpenCV ignore ###
 opencv2.framework/
 OpenCVlibrary341/
-
+OpenCV-android-sdk/
 
 ### ANDROID APPLICATION IGNORE ###
 # Built application files
