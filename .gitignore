@@ -101,6 +101,7 @@ RNTester/Pods/*
 # Visual studio
 .vscode
 .vs
+OpenCV-android-sdk/
 
 ### ANDROID APPLICATION IGNORE ###
 # Built application files

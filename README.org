@@ -80,7 +80,10 @@ save and back up the data with a back-end data representation and providing them
 a way to view this information.
 * Roles:
 Based on the categories defined above, the roles developers will play on this
-project are likely as follows:
+project are likely as follows. These roles are subject to change, as they are
+dependent on the desires of the end user, the skills of the individuals
+comprising the team, and the topics the team members want to learn about most.
+However, the final needs of the team will likely be similar to those described.
 ** Backend Engineer
 This individual will be in charge of defining the data representation of the
 ELISA plate, determining what information we have to store and how we will store
@@ -98,7 +101,7 @@ This individual will be in charge of interfacing with OpenCV and/or other
 computer vision or machine learning libraries as necessary. This will involve
 interfacing with the visual feed from the camera, identifying the ELISA plate,
 identifying the vials on the plate, and actually reading the values from these
-vials. I (the project lead) will also play a part in this portion of the
+vials. I (the project lead) plan to play the most significant part in this portion of the
 application moreso than the others as it is definitely the most technically difficult.
 * Questions (for end user)
 - How would you like the information displayed?
