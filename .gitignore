@@ -1,7 +1,10 @@
 ### OpenCV ignore ###
 opencv2.framework/
 OpenCVlibrary341/
+openCVLibrary341/
 OpenCV-android-sdk/
+jniLibs/
+
 
 ### ANDROID APPLICATION IGNORE ###
 # Built application files
@@ -9,6 +12,8 @@ OpenCV-android-sdk/
 *.aar
 *.ap_
 *.aab
+.idea/
+*.idea
 
 # Files for the ART/Dalvik VM
 *.dex
