@@ -10,13 +10,23 @@
   - [[#hacks][Hacks]]
 - [[#roadmap][Roadmap]]
   - [[#detect-the-elisa-plate][Detect the ELISA Plate]]
+    - [[#the-starter-code-should-be-able-to-identify-rectangles-as-a-nice-example][the starter code should be able to identify rectangles as a nice example]]
   - [[#read-vials][Read Vials]]
   - [[#normalize-color][Normalize Color]]
   - [[#feedback][Feedback]]
+- [[#roles][Roles:]]
+  - [[#backend-engineer][Backend Engineer]]
+  - [[#front-end-engineer][Front-end engineer]]
+  - [[#computer-vision-engineer][Computer Vision Engineer]]
 - [[#questions-for-end-user][Questions (for end user)]]
+- [[#general-development-practices][General Development Practices]]
+  - [[#github-practices][Git(Hub) Practices]]
+  - [[#other-communication][Other Communication]]
 - [[#configuration][Configuration]]
   - [[#react-native-configuration][React Native Configuration]]
   - [[#opencv-configuration][OpenCV Configuration]]
+    - [[#update-documentation-of-the-java-files-in-the-project][update documentation of the java files in the project]]
+    - [[#patch-up-the-java-files-in-the-project-that-have-been-copied][patch up the java files in the project that have been copied]]
 - [[#troubleshooting][Troubleshooting]]
 
 * Description
@@ -29,7 +39,7 @@ while compensating for differences in lighting and camera.
 This branch of the repository has a cross-platform React Native application
 with some starter code.
 
-NOTE: current demo application present is reproduced from [[https://brainhub.eu/blog/opencv-react-native-image-processing/]]
+NOTE: current demo application present is essentially reproduced from [[https://brainhub.eu/blog/opencv-react-native-image-processing/]]
 ** Module Flags
 This module provides no flags.
 
@@ -45,6 +55,7 @@ The application should be able to detect the plate without reading from external
 sources.
 It would be a good idea to show the user taking the photo that the plate has
 been detected so as to avoid taking a blurry photo and seeing skewed results.
+*** TODO the starter code should be able to identify rectangles as a nice example
 ** Read Vials
 The application should be able to take some image of the plate and identify each
 of the individual vials on the plate.
@@ -52,7 +63,9 @@ of the individual vials on the plate.
 It should record the RGB values in some standardized format.
 ** Normalize Color
 The application should (ideally) be able to normalize the color values of the
-plate to be able to obtain an accurate reading of the color values.
+plate to be able to obtain an accurate reading of the color values. This doesn't
+sound fun or important, but normalizing an image with respect to deviations in
+color as well as lens focal length is an interesting, nuanced problem.
 ** Feedback
 It would be useful to the researchers to provide an interface through the
 application to view normalized pictures of plates and view the RGB readings as
@@ -61,6 +74,32 @@ labels of some sort corresponding to each vial through the application.
 It would also be useful to store this information in a human-interpretable
 table, likely in .csv format, and to be able to back up and/or export this
 information.
+
+There are two aspects to this portion - providing the user with a service to
+save and back up the data with a back-end data representation and providing them
+a way to view this information.
+* Roles:
+Based on the categories defined above, the roles developers will play on this
+project are likely as follows:
+** Backend Engineer
+This individual will be in charge of defining the data representation of the
+ELISA plate, determining what information we have to store and how we will store
+that data. Potential for backing up this data to an AWS service to save
+long-term.
+** Front-end engineer
+This individual will be in charge of the interface to the application. How does
+the user interact with it? How do they view the data managed? Likely needs here
+are some way to display the objects detected by OpenCV / other computer vision
+utilities and a way to visualize the saved ELISA plate readings. A real-time
+display of the plate readings for each vial would be cool, but may be more
+difficult and not necessary.
+** Computer Vision Engineer
+This individual will be in charge of interfacing with OpenCV and/or other
+computer vision or machine learning libraries as necessary. This will involve
+interfacing with the visual feed from the camera, identifying the ELISA plate,
+identifying the vials on the plate, and actually reading the values from these
+vials. I (the project lead) will also play a part in this portion of the
+application moreso than the others as it is definitely the most technically difficult.
 * Questions (for end user)
 - How would you like the information displayed?
   We should prepare several suggestions and diagrams for this when initially
@@ -77,6 +116,71 @@ information.
   It's much more difficult to obtain consistent readings if we cannot rely upon
   consistent lighting conditions. Normalizing the lighting is an interesting
   problem, but may fall outside of the scope of this project.
+* General Development Practices
+We'll be using git, GitHub and Slack for our development.
+** Git(Hub) Practices
+- Never commit directly to master.
+Our flow will work approximately as follows:
+- When we come together for our first weekly meeting, we'll discuss what each
+  individual on the team wants to contribute to the project and what they'd like
+  to learn from it. This will determine the roles and assignments each team
+  member will take on for the duration of the project.
+- From these, we'll collectively break these problems down into smaller parts.
+  Each part will be defined as an 'issue' on GitHub that describes the problem
+  in detail and some suggestions for paths to take to solve it.
+  Each individual issue should take no more than 10 hours to complete, and it
+  should be completed within a week. If there are multiple tasks that will take
+  just an hour or two to complete, multiple tasks will be created for the week
+  and all assigned to the individual responsible.
+- When working on your issue(s) for the week, for each issue, create a branch
+  (~git checkout -b <branch-name>~) with the branch name approximately matching
+  the issue.
+- After the feature has been completed in the branch, do *not* push to master.
+  Instead, head to GitHub and create a pull request to merge the branch into
+  master.
+  In the body of the request, describe what you accomplished and give a brief
+  overview of how you solved the problem. Also provide comprehensive
+  instructions for others to test your code or otherwise verify that it
+  functions correctly.
+- To merge into master, a pull request will require 2/3 of the other members of
+  the team (added as 'reviewers' to the pull request) to approve the code. These
+  can be obtained more quickly by kindly poking your team members on Slack. If
+  they bring up any issues with the pull request, they should probably be fixed
+  and re-checked before the branch is merged.
+- Commit often.
+  (~git add <changed-files>~ ; ~git commit -m "relevant commit message to changes made"~).
+  Commit whenever you've written some code important enough to be
+  described at a high level in a few words (as the commit message). Make sure
+  these commit messages are informative so other developers on the team are
+  well-informed of the work done when reviewing pull requests.
+
+If a lot of this isn't familiar to you, no worries! We can go over all of this
+during our first meeting; I can hold a quick demonstration as needed.
+
+Further, if you have any issues with git or GitHub, whether it's deleting your
+local branch and all of your work or accidentally pushing your dependency
+files to GitHub, don't hesitate to reach out - we can work through it together.
+
+** Other Communication
+- We'll be communicating via Slack for everything not directly pertaining to the
+  code written; this includes setting up meetings, checking in on progress,
+  getting food, or any number of other things relevant to the project.
+- I'll have the Slackbot send a reminder to our channel for a mid-week checkin;
+  please respond to this message with your progress for the week, including any
+  potential blocks. This should be completed sometime on Wednesdays and is your
+  best oppportunity to get help with build scripts, dependency errors, or
+  whatever error might be occuring with your project.
+- I will always be available on Slack in the evenings to help out - feel free to
+  ask me any questions you may have at any time if you have questions, concerns,
+  or want advice with regards to the project, Sandbox, Computer Science at
+  Northeastern or anything else really.
+- Though we are set to put together a project by the end of the semester, the
+  most important part of this extracirricular activity is to enjoy it and learn
+  from it!
+  As such, if you're frustrated with your role in the project, please check in
+  with me and we can work together to find a new task for you for the week or
+  change your role on the team to more closely match your interests.
+
 * TODO Configuration
 How to configure this module, including common problems and how to address them.
 ** React Native Configuration
@@ -111,8 +215,8 @@ npx react-native run-android
 The Android module should already be in the right place.
 Edit the build.gradle file in openCV to match the dependency versions of the
 build.gradle of the android project. (write a script to do this automatically)
-TODO update documentation of the java files in the project
-TODO patch up the java files in the project
+*** TODO update documentation of the java files in the project
+*** TODO patch up the java files in the project that have been copied
 ~npx react-native link~
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
