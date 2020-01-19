@@ -171,5 +171,23 @@ files to GitHub, don't hesitate to reach out - we can work through it together.
 * TODO Configuration
 How to configure this module, including common problems and how to address them.
 
+Follow the instructions for your system as specified by kivy's website.
+python -m pip install --upgrade --user pip setuptools virtualenv
+
+python -m virtualenv ~/kivy_venv
+source ~/kivy_venv/bin/activate
+
+deviating from the instructions:
+pip install kivy kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/
+
+instructions say this may work on anaconda, but i don't
+would not recommend using anaconda unless on windows (bloated, annoying to
+configure, not 'unix-like')
+$ conda install kivy -c conda-forge
+
+$ virtualenv <env_name>
+$ source <env_name>/bin/activate
+(<env_name>)$ pip install -r path/to/requirements.txt
+
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
