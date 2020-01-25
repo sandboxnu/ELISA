@@ -20,7 +20,7 @@ ap.add_argument("-t", "--threshold", type=float, default=200.0,
 args = vars(ap.parse_args())
 
 # loop over the input images
-for imagePath in paths.list_images("C:/Users/arkin/Desktop/Arkin/Sandbox/Projects/ELISA/images"):
+for imagePath in paths.list_images("../images"):
     # load the image, convert it to grayscale, and compute the
     # focus measure of the image using the Variance of Laplacian
     # method
