@@ -4,6 +4,7 @@ cycler==0.10.0
 Cython==0.29.14
 docutils==0.16rc1
 idna==2.8
+imutils==0.5.3
 Kivy==2.0.0rc1
 Kivy-examples==2.0.0rc1
 Kivy-Garden==0.1.4
