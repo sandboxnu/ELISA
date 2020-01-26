@@ -1,16 +1,13 @@
-from shapedetector import ShapeDetector
 import argparse, cv2, imutils
 import numpy as np
 
 '''
 NOTES:
-- works with test images plate_black_1.jpeg -> plate_black_4.jpeg
+- works with test images plate_black_1.jpeg -> plate_black_5.jpeg
 - doesn't work if the background color is not black
-- doesn't work if the image is too zoomed out and the plate is too small
-- sometimes M["m00"] will be 0
 
 TO-DO:
-- apply a filter that dims the image so we can use slightly lighter colored backgrounds as well
+- check to see if background color is black
 '''
 
 # construct the argument parse and parse the arguments
@@ -33,39 +30,40 @@ thresh = cv2.threshold(blurred, 39, 255, cv2.THRESH_BINARY)[1]
 # for debugging:
 cv2.imshow("thresh", thresh)
 
-# find contours in the thresholded image and initialize the
-# shape detector
+# find contours in the thresholded image
 cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
 	cv2.CHAIN_APPROX_SIMPLE)
 cnts = imutils.grab_contours(cnts)
-sd = ShapeDetector()
 
-# loop over the contours
+# initialize vars to track largest contour and largest contour area
+largestC = cnts[0]
+largestArea = 0
+
+# loop over the contours to find the one with the largest area
 for c in cnts:
-    # compute the center of the contour, then detect the name of the
-    # shape using only the contour
-    M = cv2.moments(c)
-    cX = int((M["m10"] / M["m00"]) * ratio)
-    cY = int((M["m01"] / M["m00"]) * ratio)
-    shape = sd.detect(c)
+	# find area of contour
+	area = cv2.contourArea(c)
+	if area > largestArea :
+		largestArea = area
+		largestC = c
 
-    # multiply the contour (x, y)-coordinates by the resize ratio,
-    # then draw the contours and the name of the shape on the image
-    c = c.astype("float")
-    c *= ratio
-    c = c.astype("int")
-    cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+# multiply the contour (x, y)-coordinates by the resize ratio,
+# then draw the contours on the image
+largestC = largestC.astype("float")
+largestC *= ratio
+largestC = largestC.astype("int")
+cv2.drawContours(image, [largestC], -1, (0, 255, 0), 2)
 
-    # find minimum area
-    rect = cv2.minAreaRect(c)
-    # calculate coordinates of the minimum area rectangle
-    box = cv2.boxPoints(rect)
-    # normalize coordinates to integers
-    box = np.int0(box)
-    # draw contours
-    cv2.drawContours(image, [box], 0, (0,0, 255), 3)
+# find minimum area
+rect = cv2.minAreaRect(largestC)
+# calculate coordinates of the minimum area rectangle
+box = cv2.boxPoints(rect)
+# normalize coordinates to integers
+box = np.int0(box)
+# draw contours on the image
+cv2.drawContours(image, [box], 0, (0,0, 255), 3)
 
 
-    # show the output image
-    cv2.imshow("Image", imutils.resize(image, width=700))
-    cv2.waitKey(0)
+# show the output image
+cv2.imshow("Image", imutils.resize(image, width=700))
+cv2.waitKey(0)
