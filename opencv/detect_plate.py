@@ -2,6 +2,13 @@ from shapedetector import ShapeDetector
 import argparse, cv2, imutils
 import numpy as np
 
+'''
+NOTES:
+- works with test images plate_black_1.jpeg -> plate_black_4.jpeg
+- doesn't work if the background color is not black
+- doesn't work if the image is too zoomed out and the plate is too small
+'''
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
@@ -18,7 +25,9 @@ ratio = image.shape[0] / float(resized.shape[0])
 # and threshold it
 gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (11, 11), 0)
-thresh = cv2.threshold(blurred, 35, 255, cv2.THRESH_BINARY)[1]
+thresh = cv2.threshold(blurred, 39, 255, cv2.THRESH_BINARY)[1]
+# for debugging:
+# cv2.imshow("thresh", thresh)
 
 # find contours in the thresholded image and initialize the
 # shape detector
