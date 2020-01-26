@@ -7,6 +7,10 @@ NOTES:
 - works with test images plate_black_1.jpeg -> plate_black_4.jpeg
 - doesn't work if the background color is not black
 - doesn't work if the image is too zoomed out and the plate is too small
+- sometimes M["m00"] will be 0
+
+TO-DO:
+- apply a filter that dims the image so we can use slightly lighter colored backgrounds as well
 '''
 
 # construct the argument parse and parse the arguments
@@ -27,7 +31,7 @@ gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (11, 11), 0)
 thresh = cv2.threshold(blurred, 39, 255, cv2.THRESH_BINARY)[1]
 # for debugging:
-# cv2.imshow("thresh", thresh)
+cv2.imshow("thresh", thresh)
 
 # find contours in the thresholded image and initialize the
 # shape detector
