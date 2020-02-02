@@ -1,14 +1,14 @@
 import argparse, cv2, imutils
 import numpy as np
+import dete
 
 '''
 NOTES:
 - works with test images plate_black_1.jpeg -> plate_black_5.jpeg
 - doesn't work if the background color is not black
-
-TO-DO:
-- check to see if background color is black
 '''
+
+# adapted from tutorial at https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -28,7 +28,7 @@ gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (11, 11), 0)
 thresh = cv2.threshold(blurred, 39, 255, cv2.THRESH_BINARY)[1]
 # for debugging:
-cv2.imshow("thresh", thresh)
+# cv2.imshow("thresh", thresh)
 
 # find contours in the thresholded image
 cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
@@ -55,6 +55,7 @@ largestC = largestC.astype("int")
 cv2.drawContours(image, [largestC], -1, (0, 255, 0), 2)
 
 # find minimum area
+# adapted from tutorial at https://hub.packtpub.com/opencv-detecting-edges-lines-shapes/
 rect = cv2.minAreaRect(largestC)
 # calculate coordinates of the minimum area rectangle
 box = cv2.boxPoints(rect)
