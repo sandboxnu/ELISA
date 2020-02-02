@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import imutils
+from blur_detection import is_blurry
 import cv2
 
 # Represents an image of an ELISA plate
@@ -18,8 +19,16 @@ class PlateImage:
 
     # () -> Boolean
     # determines whether the image is blurry
-    def is_blurry(self):
-        raise "not yet implemented"
+    def is_blurry(self, threshold = 200):
+        def variance_of_laplacian(grayImage):
+            # compute the Laplacian of the image and then return the focus
+            # measure, which is simply the variance of the Laplacian
+            return cv2.Laplacian(grayImage, cv2.CV_64F).var()
+
+        gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+        fm = variance_of_laplacian(gray)
+
+        return fm < threshold
 
     # () -> () (mutates object)
     # generating a new image from this one
