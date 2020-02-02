@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import imutils
-from blur_detection import is_blurry
 import cv2
 
 # Represents an image of an ELISA plate
