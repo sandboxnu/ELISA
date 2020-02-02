@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import imutils
 import cv2
+import numpy as np
 
 # Represents an image of an ELISA plate
 class PlateImage:
@@ -54,11 +55,11 @@ class PlateImage:
         	avg = np.array([(totalRed/625), (totalGreen/625), (totalBlue/625)])
         	# check to see if each component of the rgb value is darker than the upper boundary, otherwise throw an error
         	if avg[0] > upperThresh[0]:
-        		raise InputError("Background must be black.")
+        		raise ValueError("Background must be black.")
         	elif avg[1] > upperThresh[1]:
-        		raise InputError("Background must be black.")
+        		raise ValueError("Background must be black.")
         	elif avg[2] > upperThresh[2]:
-        		raise InputError("Background must be black.")
+        		raise ValueError("Background must be black.")
         	else:
         		pass
 
