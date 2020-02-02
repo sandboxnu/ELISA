@@ -14,7 +14,7 @@ image = cv2.resize(image, (340,480))
 
 # shows image and waits til key is pressed to close
 cv2.imshow("Image", image)
-cv2.waitKey(0)
+#cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 # prints color as tuple
