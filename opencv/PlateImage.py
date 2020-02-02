@@ -19,8 +19,16 @@ class PlateImage:
 
     # () -> Boolean
     # determines whether the image is blurry
-    def is_blurry(self):
-        raise "not yet implemented"
+    def is_blurry(self, threshold = 200):
+        def variance_of_laplacian(grayImage):
+            # compute the Laplacian of the image and then return the focus
+            # measure, which is simply the variance of the Laplacian
+            return cv2.Laplacian(grayImage, cv2.CV_64F).var()
+
+        gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+        fm = variance_of_laplacian(gray)
+
+        return fm < threshold
 
     # () -> ()
     # raises an error if the image background isn't black
