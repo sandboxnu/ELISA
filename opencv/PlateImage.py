@@ -122,7 +122,6 @@ class PlateImage:
         largestC = largestC.astype("float")
         largestC *= ratio
         largestC = largestC.astype("int")
-        cv2.drawContours(image, [largestC], -1, (0, 255, 0), 2)
 
         # adapted from tutorial at https://hub.packtpub.com/opencv-detecting-edges-lines-shapes/
         # find minimum area
