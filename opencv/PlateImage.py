@@ -162,7 +162,25 @@ class PlateImage:
     # normalize the image to have a rectangular shape
     def normalize_shape(self):
 
-        raise "not yet implemented"
+        rect = self.detect_bounds()
+        image = self.image.copy()
+        # rotate img
+        angle = rect[2]
+        rows, cols = image.shape[0], image.shape[1]
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+        img_rot = cv2.warpAffine(image, M, (cols, rows))
+
+        # rotate bounding box
+        rect0 = (rect[0], rect[1], 0.0)
+        box = cv2.boxPoints(rect)
+        pts = np.int0(cv2.transform(np.array([box]), M))[0]
+        pts[pts < 0] = 0
+
+        # crop
+        img_crop = img_rot[pts[1][1]:pts[0][1],
+                   pts[1][0]:pts[2][0]]
+
+        return PlateImage(img_crop)
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
