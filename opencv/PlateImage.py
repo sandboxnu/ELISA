@@ -130,6 +130,23 @@ class PlateImage:
 
         return rect
 
+    # () -> New image with drawn contours
+    # draws the detected boundaries onto the image
+    def draw_contours(self):
+
+        rect = self.detect_bounds()
+        image_with_contours = self.image.copy()
+
+        # calculate coordinates of the minimum area rectangle
+        box = cv2.boxPoints(rect)
+        # normalize coordinates to integers
+        box = np.int0(box)
+        # draw contours on the image
+        cv2.drawContours(image_with_contours, [box], 0, (0, 0, 255), 3)
+
+        # return the copied image with the contours drawn onto it
+        return PlateImage(image_with_contours)
+
     # () -> [[color]]
     # reads the colors of each vial on the plate
     # returns some data structure to demonstrate the array
