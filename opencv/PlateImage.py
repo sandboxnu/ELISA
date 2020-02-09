@@ -52,24 +52,24 @@ class PlateImage:
 
         # find the average color value of the pixels in a given corner of the image and throw an error if they are lighter than the upperTresh
         def avgColor(rows, cols):
-        	totalRed = 0
-        	totalGreen = 0
-        	totalBlue = 0
-        	for r in rows:
-        		for c in rows:
-        			totalRed += image[r,c][0]
-        			totalGreen += image[r,c][1]
-        			totalBlue += image[r,c][2]
-        	avg = np.array([(totalRed/625), (totalGreen/625), (totalBlue/625)])
-        	# check to see if each component of the rgb value is darker than the upper boundary, otherwise throw an error
-        	if avg[0] > upperThresh[0]:
-        		raise ValueError("Background must be black.")
-        	elif avg[1] > upperThresh[1]:
-        		raise ValueError("Background must be black.")
-        	elif avg[2] > upperThresh[2]:
-        		raise ValueError("Background must be black.")
-        	else:
-        		pass
+            totalRed = 0
+            totalGreen = 0
+            totalBlue = 0
+            for r in rows:
+                for c in rows:
+                    totalRed += image[r,c][0]
+                    totalGreen += image[r,c][1]
+                    totalBlue += image[r,c][2]
+            avg = np.array([(totalRed/625), (totalGreen/625), (totalBlue/625)])
+            # check to see if each component of the rgb value is darker than the upper boundary, otherwise throw an error
+            if avg[0] > upperThresh[0]:
+                raise ValueError("Background must be black.")
+            elif avg[1] > upperThresh[1]:
+                raise ValueError("Background must be black.")
+            elif avg[2] > upperThresh[2]:
+                raise ValueError("Background must be black.")
+            else:
+                pass
 
         # run avgColor on all four corners
         topLeftAvg = avgColor(topRows, leftCols)
@@ -81,8 +81,8 @@ class PlateImage:
         # for debugging:
         # print("Success! Image background is black.")
 
-    # () -> () (mutates object)
-    # generating a new image from this one
+    # () -> Array of coordinates for rectangle corners
+    # determines the smallest rectangle from the detected edges of the plate
     def detect_bounds(self):
         # adapted from tutorial at https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
 
@@ -102,7 +102,7 @@ class PlateImage:
 
         # find contours in the thresholded image
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-        	cv2.CHAIN_APPROX_SIMPLE)
+            cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
 
         # initialize vars to track largest contour and largest contour area
@@ -111,11 +111,11 @@ class PlateImage:
 
         # loop over the contours to find the one with the largest area
         for c in cnts:
-        	# find area of contour
-        	area = cv2.contourArea(c)
-        	if area > largestArea :
-        		largestArea = area
-        		largestC = c
+            # find area of contour
+            area = cv2.contourArea(c)
+            if area > largestArea :
+                largestArea = area
+                largestC = c
 
         # multiply the contour (x, y)-coordinates by the resize ratio,
         # then draw the contours on the image
@@ -127,15 +127,8 @@ class PlateImage:
         # adapted from tutorial at https://hub.packtpub.com/opencv-detecting-edges-lines-shapes/
         # find minimum area
         rect = cv2.minAreaRect(largestC)
-        # calculate coordinates of the minimum area rectangle
-        box = cv2.boxPoints(rect)
-        # normalize coordinates to integers
-        box = np.int0(box)
-        # draw contours on the image
-        cv2.drawContours(image, [box], 0, (0,0, 255), 3)
 
-        # return the copied image with the contours drawn onto it
-        return image
+        return rect
 
     # () -> [[color]]
     # reads the colors of each vial on the plate
@@ -148,9 +141,10 @@ class PlateImage:
     def export_colors(self, path = "."):
         raise "not yet implemented"
 
-    # () -> () (mutates object)
+    # () -> New cropped image
     # normalize the image to have a rectangular shape
     def normalize_shape(self):
+
         raise "not yet implemented"
 
     # () -> () (mutates object)
