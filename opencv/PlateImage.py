@@ -52,24 +52,24 @@ class PlateImage:
 
         # find the average color value of the pixels in a given corner of the image and throw an error if they are lighter than the upperTresh
         def avgColor(rows, cols):
-        	totalRed = 0
-        	totalGreen = 0
-        	totalBlue = 0
-        	for r in rows:
-        		for c in rows:
-        			totalRed += image[r,c][0]
-        			totalGreen += image[r,c][1]
-        			totalBlue += image[r,c][2]
-        	avg = np.array([(totalRed/625), (totalGreen/625), (totalBlue/625)])
-        	# check to see if each component of the rgb value is darker than the upper boundary, otherwise throw an error
-        	if avg[0] > upperThresh[0]:
-        		raise ValueError("Background must be black.")
-        	elif avg[1] > upperThresh[1]:
-        		raise ValueError("Background must be black.")
-        	elif avg[2] > upperThresh[2]:
-        		raise ValueError("Background must be black.")
-        	else:
-        		pass
+            totalRed = 0
+            totalGreen = 0
+            totalBlue = 0
+            for r in rows:
+                for c in rows:
+                    totalRed += image[r,c][0]
+                    totalGreen += image[r,c][1]
+                    totalBlue += image[r,c][2]
+            avg = np.array([(totalRed/625), (totalGreen/625), (totalBlue/625)])
+            # check to see if each component of the rgb value is darker than the upper boundary, otherwise throw an error
+            if avg[0] > upperThresh[0]:
+                raise ValueError("Background must be black.")
+            elif avg[1] > upperThresh[1]:
+                raise ValueError("Background must be black.")
+            elif avg[2] > upperThresh[2]:
+                raise ValueError("Background must be black.")
+            else:
+                pass
 
         # run avgColor on all four corners
         topLeftAvg = avgColor(topRows, leftCols)
@@ -81,8 +81,8 @@ class PlateImage:
         # for debugging:
         # print("Success! Image background is black.")
 
-    # () -> () (mutates object)
-    # generating a new image from this one
+    # () -> Array of coordinates for rectangle corners
+    # determines the smallest rectangle from the detected edges of the plate
     def detect_bounds(self):
         # adapted from tutorial at https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
 
@@ -102,7 +102,7 @@ class PlateImage:
 
         # find contours in the thresholded image
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-        	cv2.CHAIN_APPROX_SIMPLE)
+            cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
 
         # initialize vars to track largest contour and largest contour area
@@ -111,31 +111,40 @@ class PlateImage:
 
         # loop over the contours to find the one with the largest area
         for c in cnts:
-        	# find area of contour
-        	area = cv2.contourArea(c)
-        	if area > largestArea :
-        		largestArea = area
-        		largestC = c
+            # find area of contour
+            area = cv2.contourArea(c)
+            if area > largestArea :
+                largestArea = area
+                largestC = c
 
         # multiply the contour (x, y)-coordinates by the resize ratio,
         # then draw the contours on the image
         largestC = largestC.astype("float")
         largestC *= ratio
         largestC = largestC.astype("int")
-        cv2.drawContours(image, [largestC], -1, (0, 255, 0), 2)
 
         # adapted from tutorial at https://hub.packtpub.com/opencv-detecting-edges-lines-shapes/
         # find minimum area
         rect = cv2.minAreaRect(largestC)
+
+        return rect
+
+    # () -> New image with drawn contours
+    # draws the detected boundaries onto the image
+    def draw_contours(self):
+
+        rect = self.detect_bounds()
+        image_with_contours = self.image.copy()
+
         # calculate coordinates of the minimum area rectangle
         box = cv2.boxPoints(rect)
         # normalize coordinates to integers
         box = np.int0(box)
         # draw contours on the image
-        cv2.drawContours(image, [box], 0, (0,0, 255), 3)
+        cv2.drawContours(image_with_contours, [box], 0, (0, 0, 255), 3)
 
         # return the copied image with the contours drawn onto it
-        return image
+        return PlateImage(image_with_contours)
 
     # () -> [[color]]
     # reads the colors of each vial on the plate
@@ -148,10 +157,29 @@ class PlateImage:
     def export_colors(self, path = "."):
         raise "not yet implemented"
 
-    # () -> () (mutates object)
+    # () -> New cropped image
     # normalize the image to have a rectangular shape
     def normalize_shape(self):
-        raise "not yet implemented"
+
+        rect = self.detect_bounds()
+        image = self.image.copy()
+        # rotate img
+        angle = rect[2]
+        rows, cols = image.shape[0], image.shape[1]
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+        img_rot = cv2.warpAffine(image, M, (cols, rows))
+
+        # rotate bounding box
+        rect0 = (rect[0], rect[1], 0.0)
+        box = cv2.boxPoints(rect)
+        pts = np.int0(cv2.transform(np.array([box]), M))[0]
+        pts[pts < 0] = 0
+
+        # crop
+        img_crop = img_rot[pts[1][1]:pts[0][1],
+                   pts[1][0]:pts[2][0]]
+
+        return PlateImage(img_crop)
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
