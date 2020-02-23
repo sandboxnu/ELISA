@@ -1,0 +1,1 @@
+This file is here to initialize the images directory for the app.

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from werkzeug.utils import secure_filename
-import imghdr
 import os
+import cv2
+import sys
+sys.path.append(os.path.abspath('../opencv'))
+from PlateImage import PlateImage
 
 ### CONFIGURATION ###
 app = Flask(__name__)
@@ -24,32 +27,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def _gen_image_path(filename):
     return os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-def _generate_filename(filetype):
-    alphanumeric = string.ascii_lowercase
-    alphanumeric += string.digits
-    # find an unused shortcode
-    while True:
-        chars = [random.choice(alphanumeric) for _ in range(6)]
-        shortcode = ''.join(chars)
-        c = db_cursor.execute("SELECT * FROM uploads"
-                " WHERE shortcode = '%s'" % shortcode)
-        # 0 rows so shortcode is unused
-        if not c.fetchall():
-            break
-    return shortcode + '.' + filetype
-
-# saves the image file to disk
-def _save_image(input_file):
-    filetype = imghdr.what(input_file)
-    if filetype is None:
-        return None
-
-    filename = _generate_filename(filetype)
-    path = _generate_path(filename)
-    input_file.save(path)
-
-    return path
-
 # applies opencv transformations to file
 # returns path to transformed image
 def _transform_img(image_path):
@@ -69,10 +46,11 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
+            # flash('No file part')
             return redirect(request.url)
         file = request.files['file']
         # if user does not select file, browser also
@@ -82,9 +60,14 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
+            upload_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(upload_location)
+            image = PlateImage(cv2.imread(upload_location))
+            if not image.is_blurry():
+                image.normalize_shape().save(path=upload_location)
+                return redirect(url_for('uploaded_file', filename=filename))
+            else:
+                return render_template('error.html', error_msg="Image is too blurry. Please retake and upload a new image.")
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -103,4 +86,6 @@ def uploaded_file(filename):
 
 ### Run server ###
 if __name__ == "__main__":
+    app.secret_key = 'super secret key'
+    app.config['SESSION_TYPE'] = 'filesystem'
     app.run(debug=True)
