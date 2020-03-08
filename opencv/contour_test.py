@@ -80,7 +80,15 @@ for i in range(0,len(contours)):
     cv2.drawContours(mask,contours,i,255,-1)
     cv2.drawContours(final, contours, i, cv2.mean(image, mask), -1)
 
+# resize image
+scale_percent = 20 # percent of original size
+width = int(image.shape[1] * scale_percent / 100)
+height = int(image.shape[0] * scale_percent / 100)
+dim = (width, height)
+image1 = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+final1 = cv2.resize(final, dim, interpolation = cv2.INTER_AREA)
+
 # show images
-cv2.imshow('Image', image)
-cv2.imshow('Final',final)
+cv2.imshow('Image', image1)
+cv2.imshow('Final', final1)
 cv2.waitKey(0)
