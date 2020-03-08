@@ -30,11 +30,12 @@ peak = codes[index_max]
 colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
 print('most frequent is %s (#%s)' % (peak, colour))
 
-c = ar.copy()
-for i, code in enumerate(codes):
-    c[scipy.r_[np.where(vecs==i)],:] = code
-imageio.imwrite('clusters.png', c.reshape(*shape).astype(np.uint8))
-print('saved clustered image')
+# save the reduced-size image with only the N most-frequent colours
+# c = ar.copy()
+# for i, code in enumerate(codes):
+#     c[scipy.r_[np.where(vecs==i)],:] = code
+# imageio.imwrite('clusters.png', c.reshape(*shape).astype(np.uint8))
+# print('saved clustered image')
 
 from colorthief import ColorThief
 color_thief = ColorThief('../images/plate_black_1.jpeg')
