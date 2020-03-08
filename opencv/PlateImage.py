@@ -12,7 +12,8 @@ class PlateImage:
     # these should be optional parameters for methods
     def __init__(self, image):
         # TODO: determine what standard size to reduce the stored image to
-        self.image = image
+        #self.image = image
+        self.image = imutils.resize(image, width=700)
 
     def from_path(self, imagePath):
         return self.__init__(cv2.imread(imagePath))
@@ -37,7 +38,6 @@ class PlateImage:
 
         # copy the image and resize the copy
         image = self.image.copy()
-        image = imutils.resize(image, width=700)
 
         # define the coordinates of the corners of the image
         num_rows, num_cols, num_dims = image.shape
