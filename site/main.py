@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from werkzeug.utils import secure_filename
 import imghdr
 import os
 
 ### CONFIGURATION ###
 app = Flask(__name__)
+app.secret_key = 'totally_secret_key'
 
 # folder, max img size
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
