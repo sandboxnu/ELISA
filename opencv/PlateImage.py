@@ -195,3 +195,67 @@ class PlateImage:
     # () -> ()
     def show(self):
         cv2.imshow("ELISA Plate", self.image)
+
+
+    # get the rgb data of colors in vials on the image
+    # () -> PlateImage
+    def get_img_data(self):
+        img = self.image.copy()
+        return PlateImage(img)
+
+
+    # converts a list of relative colors to a list of abs colors
+    # [(r,g,b)] -> [0...1]
+    def rel_to_abs_color(self, color_list):
+        abs_list = [r + g + b for r, g, b in color_list]
+        return [float(val)/sum(abs_list) for val in abs_list]
+
+   
+    # draw rgb data on the image
+    # () -> PlateImage
+    def draw_img_data(self):
+        # use this to draw shit on image
+        # label each vial with rgb
+
+        #      r, g, b
+        rgb = (1, 2, 3)
+        # row, col, pos
+        # ASSUME coordinates are from the bottom left corner of img
+        pos = (3, 2, 6)
+
+        inp = [(rgb, pos), (rgb, pos)]  # input format
+
+       # image display configuration
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 1        # scale of the font
+        color = (0, 255, 0)  # red
+        thickness = 2        # line thickness
+
+        img = self.image.copy()
+
+        # obtain relative colors list
+        # ASSUME rel colors list is same length as abs colors list
+        rel_list = self.rel_to_abs_color([rgb for (rgb, pos) in inp])
+
+        for ((r, g, b), (x, y, rad)), rel in inp, rel_list:
+            cv2.putText(
+                img,
+                # prints (r, g, b):rel
+                "({:07.3f}, {:07.3f}, {:07.3f}):{:07.3f}".format(r, g, b, rel),
+                (x, y),
+                font,
+                font_scale,
+                color,
+                thickness,
+                cv2.LINE_AA
+            )
+
+        return PlateImage(img)
+
+    # alternatives:
+    # - return original image
+    # - return processed image without plateimage constructions
+    # - return colors and markings and things
+    # - return nothing (feels bad and by necessity mutates!!!)
+    # syntatically, i think we want pattern to be: new PlateImage().normalize().draw_colors().save()
+    # so we go with returning new plateimage with the same, or returning htis
