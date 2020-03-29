@@ -19,9 +19,9 @@ pi = PlateImage(image)
 #cv2.waitKey(0)
 
 # test normalize_shape
-#pi.normalize_shape().show()
-#cv2.waitKey(0)
+# pi.normalize_shape().show()
+# cv2.waitKey(0)
 
-# test draw_vials
-pi.draw_vials()
+# test get_vials using draw_vials
+pi.normalize_shape().draw_vials()
 cv2.waitKey(0)
