@@ -181,6 +181,11 @@ class PlateImage:
 
         return PlateImage(img_crop)
 
+    def crop_image(self, radius, x, y):
+        image = self.image.copy()
+        cropped = image[(x - radius) : (x + radius), (y - radius) :(y + radius)]
+        return PlateImage(cropped)
+
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
     def normalize_color(self):
