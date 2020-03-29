@@ -15,9 +15,13 @@ pi = PlateImage(image)
 #pi.check_background()
 
 # test detect_bounds and draw_contours
-pi.draw_contours().show()
-cv2.waitKey(0)
+#pi.draw_contours().show()
+#cv2.waitKey(0)
 
 # test normalize_shape
 #pi.normalize_shape().show()
 #cv2.waitKey(0)
+
+# test draw_vials
+pi.draw_vials()
+cv2.waitKey(0)
