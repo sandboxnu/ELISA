@@ -212,7 +212,6 @@ class PlateImage:
 
         # formats to RGB tuple by rounding to int, reversing the list, and converting to tuple
         dominant_color = tuple([int(round(num)) for num in dominant_color][::-1])
-        print(dominant_color)
 
         # might be simpler way to do it if we figure out how to instantiate ColorThief without file path
         # color_thief = ColorThief(cropped)
