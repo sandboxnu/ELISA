@@ -12,8 +12,12 @@ image = cv2.imread(args["image"])
 pi = PlateImage(image)
 
 # test check_background
-pi.check_background()
+# pi.check_background()
 
 # test detect_bounds
-cv2.imshow( "Detect Bounds Results", imutils.resize(pi.detect_bounds(), width=700) )
-cv2.waitKey(0)
+# cv2.imshow( "Detect Bounds Results", imutils.resize(pi.detect_bounds(), width=700) )
+# cv2.waitKey(0)
+
+# test color detection
+location = (125, 250, 5)
+pi.find_color(location)

@@ -2,6 +2,8 @@
 import imutils
 import cv2
 import numpy as np
+import scipy.cluster
+from colorthief import ColorThief
 
 # Represents an image of an ELISA plate
 class PlateImage:
@@ -181,10 +183,42 @@ class PlateImage:
 
         return PlateImage(img_crop)
 
-    def crop_image(self, radius, x, y):
+    # calculates the dominant RGB value of a specified area on an image
+    # @param a tuple that contains the x-coordinate, y-coordinate, and radius of the location on the image
+    # @return a list containing the RGB values as a tuple and the location parameters as a tuple
+    def find_color(self, location):
         image = self.image.copy()
-        cropped = image[(x - radius) : (x + radius), (y - radius) :(y + radius)]
-        return PlateImage(cropped)
+        x = location[0]
+        y = location[1]
+        radius = location[2]
+        cropped = image[(x - radius) : (x + radius), (y - radius) : (y + radius)]
+        cv2.imshow("Cropped", cropped)
+        cv2.waitKey(0)
+
+        NUM_CLUSTERS = 5
+        ar = np.asarray(cropped)
+        shape = ar.shape
+        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+
+        # assign codes and count occurrences
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)
+        counts, bins = np.histogram(vecs, len(codes))
+
+        # find most frequent
+        index_max = np.argmax(counts)
+        dominant_color = codes[index_max]
+
+        # formats to RGB tuple by rounding to int, reversing the list, and converting to tuple
+        dominant_color = tuple([int(round(num)) for num in dominant_color][::-1])
+        print(dominant_color)
+
+        # might be simpler way to do it if we figure out how to instantiate ColorThief without file path
+        # color_thief = ColorThief(cropped)
+        # dominant_color = color_thief.get_color(quality=1)
+        # print(dominant_color)
+        return [dominant_color, location]
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
