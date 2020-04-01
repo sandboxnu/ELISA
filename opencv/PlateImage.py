@@ -113,7 +113,7 @@ class PlateImage:
         for c in cnts:
             # find area of contour
             area = cv2.contourArea(c)
-            if area > largestArea :
+            if area > largestArea:
                 largestArea = area
                 largestC = c
 
@@ -154,7 +154,8 @@ class PlateImage:
 
     # (maybe path) -> () (saves image)
     # read the colors of the image and export image to paht
-    def export_colors(self, path = "."):
+    def export_colors(self, path="."):
+        self.draw_img_data().save(path)
         raise "not yet implemented"
 
     # () -> New cropped image
@@ -177,7 +178,7 @@ class PlateImage:
 
         # crop
         img_crop = img_rot[pts[1][1]:pts[0][1],
-                   pts[1][0]:pts[2][0]]
+                           pts[1][0]:pts[2][0]]
 
         return PlateImage(img_crop)
 
@@ -188,7 +189,7 @@ class PlateImage:
 
     # (maybe path) -> ()
     # writes the image to disk
-    def save(self, path = "."):
+    def save(self, path="."):
         cv2.imwrite(path, self.image)
 
     # displays image through opencv
@@ -196,13 +197,11 @@ class PlateImage:
     def show(self):
         cv2.imshow("ELISA Plate", self.image)
 
-
     # get the rgb data of colors in vials on the image
     # () -> PlateImage
     def get_img_data(self):
         img = self.image.copy()
         return PlateImage(img)
-
 
     # converts a list of relative colors to a list of abs colors
     # [(r,g,b)] -> [0...1]
@@ -210,7 +209,6 @@ class PlateImage:
         abs_list = [r + g + b for r, g, b in color_list]
         return [float(val)/sum(abs_list) for val in abs_list]
 
-   
     # draw rgb data on the image
     # () -> PlateImage
     def draw_img_data(self):
@@ -225,9 +223,9 @@ class PlateImage:
 
         inp = [(rgb, pos), (rgb, pos)]  # input format
 
-       # image display configuration
+        # image display configuration
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1        # scale of the font
+        font_scale = 1       # scale of the font
         color = (0, 255, 0)  # red
         thickness = 2        # line thickness
 
