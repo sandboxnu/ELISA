@@ -6,7 +6,7 @@ import pandas as pd
 
 # [('label, num)] -> ['label]
 # determines whether there is an outlier in the data
-def find_outliers(data, thresh=3):
+def find_outliers(data, thresh=10):
     data = np.array(data)
     mean = np.mean(data)
     stddev = np.std(data)
@@ -20,9 +20,9 @@ def find_outliers(data, thresh=3):
 
     return outliers
 
-# [(label, num)] -> bool
+# [('label, num)] -> bool
 # determines whether there are outliers in the data
-def has_outliers(data, thresh=3):
+def has_outliers(data, thresh=10):
     return find_outliers(data, thresh=thresh) == []
 
 
@@ -234,6 +234,7 @@ class PlateImage:
 
     # draw rgb data on the image
     # () -> PlateImage
+    # throws Exception if the image data is not realistic
     def draw_img_data(self):
         # use this to draw shit on image
         # label each vial with rgb
@@ -258,6 +259,9 @@ class PlateImage:
         # ASSUME rel colors list is same length as abs colors list
         rel_list = self.rel_to_abs_color([rgb for (rgb, pos) in inp])
 
+        if has_outliers(rel_list):
+            raise Exception("A color reading was too extreme to be realistic.")
+
         for ((r, g, b), (x, y, rad)), rel in inp, rel_list:
             cv2.putText(
                 img,
@@ -272,11 +276,3 @@ class PlateImage:
             )
 
         return PlateImage(img)
-
-    # alternatives:
-    # - return original image
-    # - return processed image without plateimage constructions
-    # - return colors and markings and things
-    # - return nothing (feels bad and by necessity mutates!!!)
-    # syntatically, i think we want pattern to be: new PlateImage().normalize().draw_colors().save()
-    # so we go with returning new plateimage with the same, or returning htis
