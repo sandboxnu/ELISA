@@ -2,6 +2,29 @@
 import imutils
 import cv2
 import numpy as np
+import pandas as pd
+
+# [('label, num)] -> ['label]
+# determines whether there is an outlier in the data
+def find_outliers(data, thresh=3):
+    data = np.array(data)
+    mean = np.mean(data)
+    stddev = np.std(data)
+
+    outliers = []
+
+    for label, y in data:
+        z = (y - mean) / stddev
+        if np.abs(z) > thresh:
+            outliers.append(label)
+
+    return outliers
+
+# [(label, num)] -> bool
+# determines whether there are outliers in the data
+def has_outliers(data, thresh=3):
+    return find_outliers(data, thresh=thresh) == []
+
 
 # Represents an image of an ELISA plate
 class PlateImage:
