@@ -6,7 +6,7 @@ import pandas as pd
 
 # [('label, num)] -> ['label]
 # determines whether there is an outlier in the data
-def find_outliers(data, thresh=10):
+def find_outliers(data, thresh=3):
     data = np.array(data)
     mean = np.mean(data)
     stddev = np.std(data)
@@ -22,7 +22,7 @@ def find_outliers(data, thresh=10):
 
 # [('label, num)] -> bool
 # determines whether there are outliers in the data
-def has_outliers(data, thresh=10):
+def has_outliers(data, thresh=3):
     return find_outliers(data, thresh=thresh) != []
 
 
