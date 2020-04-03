@@ -12,8 +12,16 @@ image = cv2.imread(args["image"])
 pi = PlateImage(image)
 
 # test check_background
-pi.check_background()
+#pi.check_background()
 
-# test detect_bounds
-cv2.imshow( "Detect Bounds Results", imutils.resize(pi.detect_bounds(), width=700) )
+# test detect_bounds and draw_contours
+#pi.draw_contours().show()
+#cv2.waitKey(0)
+
+# test normalize_shape
+# pi.normalize_shape().show()
+# cv2.waitKey(0)
+
+# test get_vials using draw_vials
+pi.normalize_shape().draw_vials()
 cv2.waitKey(0)
