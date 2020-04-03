@@ -21,3 +21,7 @@ pi = PlateImage(image)
 # test color detection
 location = (125, 250, 5)
 pi.find_color(location)
+
+# test get_vials using draw_vials
+# pi.normalize_shape().draw_vials()
+# cv2.waitKey(0)

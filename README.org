@@ -5,23 +5,18 @@
 
 * Table of Contents :TOC_3:noexport:
 - [[#description][Description]]
-  - [[#module-flags][Module Flags]]
-  - [[#plugins][Plugins]]
-  - [[#hacks][Hacks]]
 - [[#roadmap][Roadmap]]
   - [[#detect-the-elisa-plate][Detect the ELISA Plate]]
   - [[#read-vials][Read Vials]]
   - [[#normalize-color][Normalize Color]]
   - [[#feedback][Feedback]]
-- [[#roles][Roles:]]
-  - [[#backend-engineer][Backend Engineer]]
-  - [[#front-end-engineer][Front-end engineer]]
-  - [[#computer-vision-engineer][Computer Vision Engineer]]
 - [[#questions-for-end-user][Questions (for end user)]]
 - [[#general-development-practices][General Development Practices]]
   - [[#github-practices][Git(Hub) Practices]]
   - [[#other-communication][Other Communication]]
 - [[#configuration][Configuration]]
+  - [[#python-virtual-environments][Python Virtual Environments:]]
+  - [[#installing-kivy][Installing Kivy]]
 - [[#troubleshooting][Troubleshooting]]
 
 * Description
@@ -30,15 +25,6 @@ measurements.
 
 It's able to scan a plate and record the RGB values of each individual vial
 while compensating for differences in lighting and camera.
-
-** Module Flags
-This module provides no flags.
-
-** Plugins
-{A list of linked plugins}
-
-** Hacks
-{A list of internal modifications to included packages}
 
 * Roadmap
 ** Detect the ELISA Plate
@@ -62,47 +48,35 @@ labels of some sort corresponding to each vial through the application.
 It would also be useful to store this information in a human-interpretable
 table, likely in .csv format, and to be able to back up and/or export this
 information.
-* Roles:
-Based on the categories defined above, the roles developers will play on this
-project are likely as follows. These roles are subject to change, as they are
-dependent on the desires of the end user, the skills of the individuals
-comprising the team, and the topics the team members want to learn about most.
-However, the final needs of the team will likely be similar to those described.
-** Backend Engineer
-This individual will be in charge of defining the data representation of the
-ELISA plate, determining what information we have to store and how we will store
-that data. Potential for backing up this data to an AWS service to save
-long-term.
-** Front-end engineer
-This individual will be in charge of the interface to the application. How does
-the user interact with it? How do they view the data managed? Likely needs here
-are some way to display the objects detected by OpenCV / other computer vision
-utilities and a way to visualize the saved ELISA plate readings. A real-time
-display of the plate readings for each vial would be cool, but may be more
-difficult and not necessary.
-** Computer Vision Engineer
-This individual will be in charge of interfacing with OpenCV and/or other
-computer vision or machine learning libraries as necessary. This will involve
-interfacing with the visual feed from the camera, identifying the ELISA plate,
-identifying the vials on the plate, and actually reading the values from these
-vials. I (the project lead) will also play a part in this portion of the
-application moreso than the others as it is definitely the most technically difficult
+
+This information can be provided through an accompanying web application and
+mobile application that will allow users to take a photo or upload an image,
+then receive a response - either that the image was malformed and we could not
+detect it, or the successful results presented from the analysis of the plate.
 * Questions (for end user)
 - How would you like the information displayed?
   We should prepare several suggestions and diagrams for this when initially
   meeting with the researcher. How they view the data for the readings is just
   as important as their ability to record the readings through our application;
   if they are not able to view the results, they have gotten nothing!
+
+  Response: so far, whatever we are able to accomplish and present in terms of
+  data visualization will be neat for the researcher to see; after we develop a
+  clear front-end produce to show them, they will likely provide further
+  feedback on this design upon which we can iterate.
 - What information do you need?
   e.g. RGB values, original image of the plate, normalized image of the plate
 - Will you be able to use the same smartphone for each reading?
 - Could this smartphone be an Android smartphone?
-  (We can develop a React Native cross-platform application or a native Android
-  application)
+  The researcher has an iPhone, but we can hopefully compile the application for
+  a cross-platform framework upon which we can scaffold the app.
 - Will the lighting condition be consistent?
   It's much more difficult to obtain consistent readings if we cannot rely upon
   consistent lighting conditions. Normalizing the lighting is an interesting
   problem, but may fall outside of the scope of this project.
+
+  So far, we have logic to ensure that the background is dark in color, but
+  whether the background is cool is unclear.
 * General Development Practices
 We'll be using git, GitHub and Slack for our development.
 ** Git(Hub) Practices
@@ -135,15 +109,11 @@ Our flow will work approximately as follows:
   they bring up any issues with the pull request, they should probably be fixed
   and re-checked before the branch is merged.
 - Commit often.
-  (~git add <changed-files>~ ; ~git commit -m "relevant commit message to changes made"~).
+  (~git add <changed-files> ; ~git commit -m "relevant commit message to changes made"~).
   Commit whenever you've written some code important enough to be
   described at a high level in a few words (as the commit message). Make sure
   these commit messages are informative so other developers on the team are
   well-informed of the work done when reviewing pull requests.
-
-If a lot of this isn't familiar to you, no worries! We can go over all of this
-during our first meeting; I can hold a quick demonstration as needed.
-
 Further, if you have any issues with git or GitHub, whether it's deleting your
 local branch and all of your work or accidentally pushing your dependency
 files to GitHub, don't hesitate to reach out - we can work through it together.
@@ -168,26 +138,46 @@ files to GitHub, don't hesitate to reach out - we can work through it together.
   with me and we can work together to find a new task for you for the week or
   change your role on the team to more closely match your interests.
 
-* TODO Configuration
+* Configuration
 How to configure this module, including common problems and how to address them.
 
+** Python Virtual Environments:
+We'll start by configuring a virtual environment in which we can safely install dependencies.
+
+Installing virtual environment:
+```python -m pip install --upgrade --user pip setuptools virtualenv```
+
+Creating the virtual environment and activating it:
+```
+$ python -m virtualenv ~/kivy_venv
+$ source ~/kivy_venv/bin/activate
+$ virtualenv <env_name>
+```
+
+Starting the virtual environment!
+```
+$ source <env_name>/bin/activate
+```
+
+Installing all of the requirements(if there is a folder present):
+```(<env_name>)$ pip install -r path/to/requirements.txt```
+
+If this is successful, an indication that you're in the virtual environment
+kivy_venv should be present to the left fo your prompt.
+
+** Installing Kivy
 Follow the instructions for your system as specified by kivy's website.
-python -m pip install --upgrade --user pip setuptools virtualenv
-
-python -m virtualenv ~/kivy_venv
-source ~/kivy_venv/bin/activate
-
 deviating from the instructions:
+
 pip install kivy kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/
 
 instructions say this may work on anaconda, but i don't
 would not recommend using anaconda unless on windows (bloated, annoying to
 configure, not 'unix-like')
-$ conda install kivy -c conda-forge
-
-$ virtualenv <env_name>
-$ source <env_name>/bin/activate
-(<env_name>)$ pip install -r path/to/requirements.txt
+```
+conda install kivy -c conda-forge
+```
 
 * TODO Troubleshooting
 Common issues and their solution, or places to look for help.
+Update this as you run into issues building the project and find solutions!
