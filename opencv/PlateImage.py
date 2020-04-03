@@ -23,7 +23,7 @@ def find_outliers(data, thresh=10):
 # [('label, num)] -> bool
 # determines whether there are outliers in the data
 def has_outliers(data, thresh=10):
-    return find_outliers(data, thresh=thresh) == []
+    return find_outliers(data, thresh=thresh) != []
 
 
 # Represents an image of an ELISA plate
