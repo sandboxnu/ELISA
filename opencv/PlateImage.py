@@ -236,7 +236,6 @@ class PlateImage:
     # () -> PlateImage
     # throws Exception if the image data is not realistic
     def draw_img_data(self):
-        # use this to draw shit on image
         # label each vial with rgb
 
         #      r, g, b
