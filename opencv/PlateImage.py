@@ -11,8 +11,6 @@ class PlateImage:
     # when adding parameters (such as thresholds),
     # these should be optional parameters for methods
     def __init__(self, image):
-        # TODO: determine what standard size to reduce the stored image to
-        #self.image = image
         self.image = imutils.resize(image, width=700)
 
     def from_path(self, imagePath):
