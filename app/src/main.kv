@@ -1,0 +1,31 @@
+ScreenManagement:
+	SelectScreen:
+	CameraScreen:
+    ReviewScreen:
+	
+<SelectScreen>:
+	name: "select"
+	Button:
+		on_release: app.root.current = "camera"
+		text: "Take Picture"
+		font_size: 50
+		
+<CameraScreen>:
+	name: "camera"
+    BoxLayout:
+        orientation: "vertical"
+        KivyCamera
+            id: kc
+        Button:
+            on_release: app.root.current = 'review'
+            on_press: kc.save_img()
+            text: "Select Picture to Analyze"
+            font_size: 50
+
+
+<ReviewScreen>:
+    name: "review"
+    Button:
+        on_release: app.root.current = "select"
+        text: "To Select"
+        font_size: 50
