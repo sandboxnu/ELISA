@@ -64,10 +64,14 @@ def upload_file():
             file.save(upload_location)
             image = PlateImage(cv2.imread(upload_location))
             if not image.is_blurry():
-                image.normalize_shape().save(path=upload_location)
+                # try:
+                image.normalize_shape().draw_contours().save(path=upload_location)
                 return redirect(url_for('uploaded_file', filename=filename))
+                # except:
+                    # return '''<!doctype html> <h2>the image could not be read from. please try again.</h2>'''
             else:
-                return render_template('error.html', error_msg="Image is too blurry. Please retake and upload a new image.")
+                return ''' <!doctype html> <h2> the image was too blurry to be read from. either adjust the blurriness criteria or try again. </h2>''' # render_template('error.html', error_msg="Image is too blurry. Please retake and upload a new image.")
+
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -88,4 +92,4 @@ def uploaded_file(filename):
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=80)
