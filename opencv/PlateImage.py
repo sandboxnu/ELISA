@@ -2,6 +2,8 @@
 import imutils
 import cv2
 import numpy as np
+import scipy.cluster
+from colorthief import ColorThief
 
 # Represents an image of an ELISA plate
 class PlateImage:
@@ -11,8 +13,7 @@ class PlateImage:
     # when adding parameters (such as thresholds),
     # these should be optional parameters for methods
     def __init__(self, image):
-        # TODO: determine what standard size to reduce the stored image to
-        self.image = image
+        self.image = imutils.resize(image, width=700)
 
     def from_path(self, imagePath):
         return self.__init__(cv2.imread(imagePath))
@@ -37,7 +38,6 @@ class PlateImage:
 
         # copy the image and resize the copy
         image = self.image.copy()
-        image = imutils.resize(image, width=700)
 
         # define the coordinates of the corners of the image
         num_rows, num_cols, num_dims = image.shape
@@ -381,6 +381,7 @@ class PlateImage:
         vials = self.get_vials()
         image = self.image.copy()
         image = imutils.resize(image, width=700)
+        
         for vial in vials:
             # highlight pixel at center
             image[vial[1]][vial[0]] = [0, 0, 255]
@@ -443,8 +444,8 @@ class PlateImage:
             image[bottom-1][right] = [0, 255, 0]
             image[bottom-1][right-1] = [0, 255, 0]
 
-        # cv2.imshow("Vial locations", imutils.resize(image, width=500))
-        return PlateImage(imutils.resize(image, width=700))
+        return PlateImage(imutils.resize(image, width=500))
+
 
     # () -> [[color]]
     # reads the colors of each vial on the plate
@@ -480,6 +481,42 @@ class PlateImage:
                    pts[1][0]:pts[2][0]]
 
         return PlateImage(img_crop)
+
+    # calculates the dominant RGB value of a specified area on an image
+    # @param a tuple that contains the x-coordinate, y-coordinate, and radius of the location on the image
+    # @return a list containing the RGB values as a tuple and the location parameters as a tuple
+    def find_color(self, location):
+        image = self.image.copy()
+        x = location[0]
+        y = location[1]
+        radius = location[2]
+        cropped = image[(x - radius) : (x + radius), (y - radius) : (y + radius)]
+        cv2.imshow("Cropped", cropped)
+        cv2.waitKey(0)
+
+        NUM_CLUSTERS = 5
+        ar = np.asarray(cropped)
+        shape = ar.shape
+        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+
+        # assign codes and count occurrences
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)
+        counts, bins = np.histogram(vecs, len(codes))
+
+        # find most frequent
+        index_max = np.argmax(counts)
+        dominant_color = codes[index_max]
+
+        # formats to RGB tuple by rounding to int, reversing the list, and converting to tuple
+        dominant_color = tuple([int(round(num)) for num in dominant_color][::-1])
+
+        # might be simpler way to do it if we figure out how to instantiate ColorThief without file path
+        # color_thief = ColorThief(cropped)
+        # dominant_color = color_thief.get_color(quality=1)
+        # print(dominant_color)
+        return [dominant_color, location]
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
