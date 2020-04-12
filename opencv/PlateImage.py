@@ -101,8 +101,6 @@ class PlateImage:
         gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (11, 11), 0)
         thresh = cv2.threshold(blurred, 39, 255, cv2.THRESH_BINARY)[1]
-        # for debugging:
-        # cv2.imshow("thresh", thresh)
 
         # find contours in the thresholded image
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
@@ -134,7 +132,7 @@ class PlateImage:
 
         return rect
 
-   
+
     # () -> New image with drawn contours
     # draws the detected boundaries onto the image
     def draw_contours(self):
@@ -161,115 +159,13 @@ class PlateImage:
         dims = self.image.shape
         center = ((dims[0]) // 2, (dims[1]) // 2)
 
-        return [  # Row 7
-                (center[1] - 35, center[0] + 28, 10),   # E7
-                (center[1] + 35, center[0] + 28, 10),   # D7
-                (center[1] - 110, center[0] + 28, 10),  # F7
-                (center[1] + 110, center[0] + 28, 10),  # C7
-                (center[1] - 185, center[0] + 28, 10),  # G7
-                (center[1] + 185, center[0] + 28, 10),  # B7
-                (center[1] - 260, center[0] + 28, 10),  # H7
-                (center[1] + 260, center[0] + 28, 10),  # A7
-                # Ro w  6
-                (center[1] - 35, center[0] - 50, 10),   # E6
-                (center[1] + 35, center[0] - 50, 10),   # D6
-                (center[1] - 110, center[0] - 50, 10),  # F6
-                (center[1] + 110, center[0] - 50, 10),  # C6
-                (center[1] - 185, center[0] - 50, 10),  # G6
-                (center[1] + 185, center[0] - 50, 10),  # B6
-                (center[1] - 260, center[0] - 50, 10),  # H6
-                (center[1] + 260, center[0] - 50, 10),  # A6
-                # Row 5
-                (center[1] - 35, center[0] - 120, 10),  # E5
-                (center[1] + 35, center[0] - 120, 10),  # D5
-                (center[1] - 110, center[0] - 120, 10), # F5
-                (center[1] + 110, center[0] - 120, 10), # C5
-                (center[1] - 185, center[0] - 120, 8),  # G5
-                (center[1] + 185, center[0] - 120, 8),  # B5
-                (center[1] - 260, center[0] - 120, 8),  # H5
-                (center[1] + 260, center[0] - 120, 8),  # A5
-                # Row 4
-                (center[1] - 35, center[0] - 200, 10),  # E4
-                (center[1] + 35, center[0] - 200, 10),  # D4
-                (center[1] - 110, center[0] - 200, 10), # F4
-                (center[1] + 110, center[0] - 200, 10), # C4
-                (center[1] - 185, center[0] - 200, 8),  # G4
-                (center[1] + 185, center[0] - 200, 8),  # B4
-                (center[1] - 260, center[0] - 200, 8),  # H4
-                (center[1] + 260, center[0] - 200, 8),  # A4
-                # Row 3
-                (center[1] - 35, center[0] - 280, 10),  # E3
-                (center[1] + 35, center[0] - 280, 10),  # D3
-                (center[1] - 110, center[0] - 280, 10), # F3
-                (center[1] + 110, center[0] - 280, 10), # C3
-                (center[1] - 185, center[0] - 280, 8),  # G3
-                (center[1] + 185, center[0] - 280, 8),  # B3
-                (center[1] - 260, center[0] - 280, 8),  # H3
-                (center[1] + 260, center[0] - 280, 8),  # A3
-                # Row 2
-                (center[1] - 35, center[0] - 350, 9),   # E2
-                (center[1] + 35, center[0] - 350, 9),   # D2
-                (center[1] - 110, center[0] - 350, 9),  # F2
-                (center[1] + 110, center[0] - 350, 9),  # C2
-                (center[1] - 185, center[0] - 350, 8),  # G2
-                (center[1] + 185, center[0] - 350, 8),  # B2
-                (center[1] - 260, center[0] - 350, 8),  # H2
-                (center[1] + 260, center[0] - 350, 8),  # A2
-                # Row 1
-                (center[1] - 35, center[0] - 415, 9),   # E1
-                (center[1] + 35, center[0] - 415, 9),   # D1
-                (center[1] - 110, center[0] - 415, 9),  # F1
-                (center[1] + 110, center[0] - 415, 9),  # C1
-                (center[1] - 185, center[0] - 415, 8),  # G1
-                (center[1] + 185, center[0] - 415, 8),  # B1
-                (center[1] - 260, center[0] - 415, 6),  # H1
-                (center[1] + 250, center[0] - 415, 6),  # A1
-                # Row 8
-                (center[1] - 35, center[0] + 100, 10),  # E8
-                (center[1] + 35, center[0] + 100, 10),  # D8
-                (center[1] - 110, center[0] + 100, 10), # F8
-                (center[1] + 110, center[0] + 100, 10), # C8
-                (center[1] - 185, center[0] + 100, 8),  # G8
-                (center[1] + 185, center[0] + 100, 8),  # B8
-                (center[1] - 260, center[0] + 100, 8),  # H8
-                (center[1] + 260, center[0] + 100, 8),  # A8
-                # Row 9
-                (center[1] - 35, center[0] + 175, 10),  # E9
-                (center[1] + 35, center[0] + 175, 10),  # D9
-                (center[1] - 110, center[0] + 175, 10), # F9
-                (center[1] + 110, center[0] + 175, 10), # C9
-                (center[1] - 185, center[0] + 175, 8),  # G9
-                (center[1] + 185, center[0] + 175, 8),  # B9
-                (center[1] - 260, center[0] + 175, 8),  # H9
-                (center[1] + 260, center[0] + 175, 8),  # A9
-                # Row 10
-                (center[1] - 35, center[0] + 250, 10),  # E10
-                (center[1] + 35, center[0] + 250, 10),  # D10
-                (center[1] - 110, center[0] + 250, 10), # F10
-                (center[1] + 110, center[0] + 250, 10), # C10
-                (center[1] - 185, center[0] + 250, 8),  # G10
-                (center[1] + 190, center[0] + 250, 8),  # B10
-                (center[1] - 265, center[0] + 250, 8),  # H10
-                (center[1] + 265, center[0] + 250, 8),  # A10
-                # Row 11
-                (center[1] - 35, center[0] + 330, 9),   # E11
-                (center[1] + 35, center[0] + 330, 9),   # D11
-                (center[1] - 110, center[0] + 330, 9),  # F11
-                (center[1] + 110, center[0] + 330, 9),  # C11
-                (center[1] - 185, center[0] + 330, 8),  # G11
-                (center[1] + 190, center[0] + 330, 8),  # B11
-                (center[1] - 265, center[0] + 330, 8),  # H11
-                (center[1] + 265, center[0] + 330, 8),  # A11
-                # Row 12
-                (center[1] - 35, center[0] + 410, 9),   # E12
-                (center[1] + 35, center[0] + 410, 9),   # D12
-                (center[1] - 110, center[0] + 410, 9),  # F12
-                (center[1] + 110, center[0] + 410, 9),  # C12
-                (center[1] - 185, center[0] + 410, 8),  # G12
-                (center[1] + 190, center[0] + 410, 8),  # B12
-                (center[1] - 265, center[0] + 410, 6),  # H12
-                (center[1] + 265, center[0] + 410, 6),  # A12
-                ]
+        row_adjustments = [-35, 35, -110, 110, -185, 185, -260, 260]
+        col_adjustments = [28, -50, -120, -200, -280, -350, -415, 100, 175, 250, 330, 410]
+        radius = 10
+
+        return [(center[1] + r_adj, center[0] + c_adj, radius)
+                for r_adj in row_adjustments
+                for c_adj in col_adjustments]
 
 
     # () -> New image with important pixels highlighted
