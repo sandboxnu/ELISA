@@ -36,7 +36,6 @@ def _transform_img(image_path):
     # return modified image (or unmodified if it bad)
     return image_path
 
-
 ### Routes ###
 
 # determines whether a file name is valid
@@ -52,44 +51,39 @@ def upload_file():
         if 'file' not in request.files:
             # flash('No file part')
             return redirect(request.url)
+
         file = request.files['file']
+
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             upload_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(upload_location)
             image = PlateImage(cv2.imread(upload_location))
-            if not image.is_blurry():
-                # try:
-                image.normalize_shape().draw_contours().save(path=upload_location)
-                return redirect(url_for('uploaded_file', filename=filename))
-                # except:
-                    # return '''<!doctype html> <h2>the image could not be read from. please try again.</h2>'''
-            else:
-                return ''' <!doctype html> <h2> the image was too blurry to be read from. either adjust the blurriness criteria or try again. </h2>''' # render_template('error.html', error_msg="Image is too blurry. Please retake and upload a new image.")
 
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+            if not image.is_blurry():
+                try:
+                    image.normalize_shape().draw_contours().save(path=upload_location)
+                    return redirect(url_for('uploaded_file', filename=filename))
+                except:
+                    return render_template('error.html', error = 'The image could not be read from. Please try again.')
+            else:
+                return render_template('error.html', error = 'The image was too blurry to be read from. Please adjust the blurriness criteria or upload a new image.')
+
+    return render_template('index.html')
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-
 ### Run server ###
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="127.0.0.1", port=5000)
