@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title>ELISA Scanner</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>ELISA Scanner: <a href="/">Home</a></div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
