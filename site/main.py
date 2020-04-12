@@ -9,7 +9,7 @@ import cv2
 
 
 ### CONFIGURATION ###
-app = Flask(__name__)
+app = Flask(__name__, static_folder="images")
 
 # folder, max img size
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
@@ -69,18 +69,25 @@ def upload_file():
             if not image.is_blurry():
                 try:
                     image.normalize_shape().draw_contours().save(path=upload_location)
+
                     return redirect(url_for('uploaded_file', filename=filename))
                 except:
-                    return render_template('error.html', error = 'The image could not be read from. Please try again.')
+                    message = 'The image could not be read from. Please try again.'
+                    return redirect(url_for('error_message', error=message))
             else:
-                return render_template('error.html', error = 'The image was too blurry to be read from. Please adjust the blurriness criteria or upload a new image.')
+                message = 'The image was too blurry to be read from. Please adjust the blurriness criteria or upload a new image.'
+                return redirect(url_for('error_message', message=message))
 
     return render_template('index.html')
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
+        return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
+@app.route('/error/<message>')
+def error_message(message):
+    return render_template('error.html', error=message)
 
 ### Run server ###
 if __name__ == "__main__":
