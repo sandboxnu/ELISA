@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title> Error </title>
-  </head>
-  <body>
-    <a href = "/"> Try again </a>
-    <p> {{error_msg}} </p>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    {% if error %}
+    <h2>{{ error }}</h2>
+    {% else %}
+    <h2>Sorry, there was an issue. Please try again.</h2>
+    {% endif %}
+{% endblock %}
