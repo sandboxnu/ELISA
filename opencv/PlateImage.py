@@ -46,12 +46,14 @@ class PlateImage:
         # copy the image and resize the copy
         image = self.image.copy()
 
+
         # define the coordinates of the corners of the image
+        corner_offset = 25
         num_rows, num_cols, num_dims = image.shape
-        top_rows = range(25)
-        bot_rows = range((num_rows-25), num_rows)
-        left_cols = range(25)
-        right_cols = range((num_cols-25), num_cols)
+        top_rows = range(corner_offset)
+        bot_rows = range((num_rows-corner_offset), num_rows)
+        left_cols = range(corner_offset)
+        right_cols = range((num_cols-corner_offset), num_cols)
 
         # find the average color value of the pixels in a given corner of image
         # throw an error if they are lighter than the upperTresh
@@ -66,7 +68,7 @@ class PlateImage:
                     total_blue  += image[r, c][2]
             avg = np.array([(total_red/625),
                             (total_green/625),
-                            (total_blue/625)]) # TODO magic numbers
+                            (total_blue/625)])  # TODO magic numbers
 
             # check to see if each component of the rgb value is darker than
             # upper boundary, otherwise throw an error
@@ -83,7 +85,7 @@ class PlateImage:
         # if code executes to this point, this means that the background
         # of the image was within the defined boundaries
 
-       
+
     # () -> Array of coordinates for rectangle corners
     # determines the smallest rectangle from the detected edges of the plate
     def detect_bounds(self):
@@ -160,7 +162,8 @@ class PlateImage:
         center = ((dims[0]) // 2, (dims[1]) // 2)
 
         row_adjustments = [-35, 35, -110, 110, -185, 185, -260, 260]
-        col_adjustments = [28, -50, -120, -200, -280, -350, -415, 100, 175, 250, 330, 410]
+        col_adjustments = [28, -50, -120, -200, -280, -350,
+                           -415, 100, 175, 250, 330, 410]
         radius = 10
 
         return [(center[1] + r_adj, center[0] + c_adj, radius)
@@ -174,72 +177,42 @@ class PlateImage:
     def draw_vials(self):
         vials = self.get_vials()
         image = self.image.copy()
+
+        RED = [0, 0, 255]
+        GREEN = [0, 255, 0]
+        pos_offsets = [-1, 0, 1]
+
         for vial in vials:
             # highlight pixel at center
-            image[vial[1]][vial[0]] = [0, 0, 255]
+            image[vial[1]][vial[0]] = RED
 
-            # also turn its neighboring pixels red for better visualization
-            image[vial[1]+1][vial[0]+1] = [0, 0, 255]
-            image[vial[1]+1][vial[0]] = [0, 0, 255]
-            image[vial[1]+1][vial[0]-1] = [0, 0, 255]
-            image[vial[1]][vial[0]+1] = [0, 0, 255]
-            image[vial[1]][vial[0]-1] = [0, 0, 255]
-            image[vial[1]-1][vial[0]+1] = [0, 0, 255]
-            image[vial[1]-1][vial[0]] = [0, 0, 255]
-            image[vial[1]-1][vial[0]-1] = [0, 0, 255]
+            for x_off in pos_offsets:
+                for y_off in pos_offsets:
+                    # also turn its neighboring pixels red
+                    # for better visualization
+                    image[vial[1]+x_off][vial[0]+y_off] = RED
 
             # draw the corners of the square based on the radius in green
             # highlight their neighbors are well for better visualization
-            top = vial[1]-vial[2]
+            top    = vial[1]-vial[2]
             bottom = vial[1]+vial[2]
-            left = vial[0]-vial[2]
-            right = vial[0]+vial[2]
+            left   = vial[0]-vial[2]
+            right  = vial[0]+vial[2]
+
+            # locations of the four corners
+            corner_locs = [(top, left),
+                           (top, right),
+                           (bottom, left),
+                           (bottom, right)]
 
             # top left
-            image[top][left] = [0, 255, 0]
-            image[top+1][left+1] = [0, 255, 0]
-            image[top+1][left] = [0, 255, 0]
-            image[top+1][left-1] = [0, 255, 0]
-            image[top][left] = [0, 255, 0]
-            image[top][left] = [0, 255, 0]
-            image[top-1][left+1] = [0, 255, 0]
-            image[top-1][left] = [0, 255, 0]
-            image[top-1][left-1] = [0, 255, 0]
-
-            # top right
-            image[top][right] = [0, 255, 0]
-            image[top+1][right+1] = [0, 255, 0]
-            image[top+1][right] = [0, 255, 0]
-            image[top+1][right-1] = [0, 255, 0]
-            image[top][right] = [0, 255, 0]
-            image[top][right] = [0, 255, 0]
-            image[top-1][right+1] = [0, 255, 0]
-            image[top-1][right] = [0, 255, 0]
-            image[top-1][right-1] = [0, 255, 0]
-
-            # bottom left
-            image[bottom][left] = [0, 255, 0]
-            image[bottom+1][left+1] = [0, 255, 0]
-            image[bottom+1][left] = [0, 255, 0]
-            image[bottom+1][left-1] = [0, 255, 0]
-            image[bottom][left] = [0, 255, 0]
-            image[bottom][left] = [0, 255, 0]
-            image[bottom-1][left+1] = [0, 255, 0]
-            image[bottom-1][left] = [0, 255, 0]
-            image[bottom-1][left-1] = [0, 255, 0]
-
-            # bottom right
-            image[bottom][right] = [0, 255, 0]
-            image[bottom+1][right+1] = [0, 255, 0]
-            image[bottom+1][right] = [0, 255, 0]
-            image[bottom+1][right-1] = [0, 255, 0]
-            image[bottom][right] = [0, 255, 0]
-            image[bottom][right] = [0, 255, 0]
-            image[bottom-1][right+1] = [0, 255, 0]
-            image[bottom-1][right] = [0, 255, 0]
-            image[bottom-1][right-1] = [0, 255, 0]
+            for x_loc, y_loc in corner_locs:
+                for x_off in pos_offsets:
+                    for y_off in pos_offsets:
+                        image[x_loc + x_off][y_loc + y_off] = GREEN
 
         cv2.imshow("Vial locations", imutils.resize(image, width=500))
+
 
     # () -> [[color]]
     # reads the colors of each vial on the plate
@@ -248,13 +221,14 @@ class PlateImage:
         raise "not yet implemented"
     # TODO: maybe remove
 
+
     # (maybe path) -> () (saves image)
     # read the colors of the image and export image to paht
     def export_colors(self, path="."):
         raise "not yet implemented"
     # TODO: maybe remove
 
-   
+
     # () -> New cropped image
     # normalize the image to have a rectangular shape
     def normalize_shape(self):
@@ -317,6 +291,7 @@ class PlateImage:
     # normalize the colors of the image to improve color accuracy
     def normalize_color(self):
         raise "not yet implemented"
+        # TODO: unclear whether we need to do this
 
     # (maybe path) -> ()
     # writes the image to disk at provided path
