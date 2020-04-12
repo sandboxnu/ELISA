@@ -9,7 +9,7 @@ import cv2
 
 
 ### CONFIGURATION ###
-app = Flask(__name__, static_folder="images")
+app = Flask(__name__)
 
 # folder, max img size
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
@@ -70,7 +70,7 @@ def upload_file():
                 try:
                     image.normalize_shape().draw_contours().save(path=upload_location)
 
-                    return redirect(url_for('uploaded_file', filename=filename))
+                    return render_template('upload.html', filename=filename)
                 except:
                     message = 'The image could not be read from. Please try again.'
                     return redirect(url_for('error_message', error=message))
@@ -82,8 +82,7 @@ def upload_file():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-        return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
+    return send_from_directory("images", filename)
 
 @app.route('/error/<message>')
 def error_message(message):
