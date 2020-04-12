@@ -60,23 +60,19 @@ class PlateImage:
             total_green = 0
             total_blue = 0
             for r in rows:
-                for c in rows:
-                    total_red += image[r, c][0]
+                for c in cols:
+                    total_red   += image[r, c][0]
                     total_green += image[r, c][1]
-                    total_blue += image[r, c][2]
+                    total_blue  += image[r, c][2]
             avg = np.array([(total_red/625),
                             (total_green/625),
-                            (total_blue/625)])
+                            (total_blue/625)]) # TODO magic numbers
+
             # check to see if each component of the rgb value is darker than
             # upper boundary, otherwise throw an error
-            if avg[0] > upper_thresh[0]:
-                raise ValueError("Background must be black.")
-            elif avg[1] > upper_thresh[1]:
-                raise ValueError("Background must be black.")
-            elif avg[2] > upper_thresh[2]:
-                raise ValueError("Background must be black.")
-            else:
-                pass
+            for avg_color, thresh in avg, upper_thresh:
+                if avg_color > thresh:
+                    raise ValueError("Background must be black.")
 
         # run avg_color on all four corners
         avg_color(top_rows, left_cols)
