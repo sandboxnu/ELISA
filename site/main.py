@@ -2,11 +2,11 @@
 
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from werkzeug.utils import secure_filename
+from opencv.PlateImage import PlateImage
+
 import os
 import cv2
-import sys
-sys.path.append(os.path.abspath('../opencv'))
-from PlateImage import PlateImage
+
 
 ### CONFIGURATION ###
 app = Flask(__name__)
