@@ -3,6 +3,9 @@ import imutils
 import cv2
 import numpy as np
 import pandas as pd
+import scipy.cluster
+from colorthief import ColorThief
+
 
 # [('label, num)] -> ['label]
 # determines whether there is an outlier in the data
@@ -25,7 +28,7 @@ def find_outliers(data, thresh=3):
 def has_outliers(data, thresh=3):
     return find_outliers(data, thresh=thresh) != []
 
-
+  
 # Represents an image of an ELISA plate
 class PlateImage:
 
@@ -34,8 +37,7 @@ class PlateImage:
     # when adding parameters (such as thresholds),
     # these should be optional parameters for methods
     def __init__(self, image):
-        # TODO: determine what standard size to reduce the stored image to
-        self.image = image
+        self.image = imutils.resize(image, width=700)
 
     def from_path(self, imagePath):
         return self.__init__(cv2.imread(imagePath))
@@ -60,7 +62,6 @@ class PlateImage:
 
         # copy the image and resize the copy
         image = self.image.copy()
-        image = imutils.resize(image, width=700)
 
         # define the coordinates of the corners of the image
         num_rows, num_cols, num_dims = image.shape
@@ -169,6 +170,304 @@ class PlateImage:
         # return the copied image with the contours drawn onto it
         return PlateImage(image_with_contours)
 
+    # () -> [[(row, col, radius)]]
+    # generates a list of the vial locations
+    # returns the center positions and radii (half side length of square) of the areas from which we will read the colors
+    def get_vials(self):
+        dims = self.image.shape
+        center = ((dims[0]) // 2, (dims[1]) // 2)
+        '''
+        return [ # Row 7
+                (center[0] + 28, center[1] - 35, 10), #E7
+                (center[0] + 28, center[1] + 35, 10), #D7
+                (center[0] + 28, center[1] - 110, 10), #F7
+                (center[0] + 28, center[1] + 110, 10), #C7
+                (center[0] + 28, center[1] - 185, 10), #G7
+                (center[0] + 28, center[1] + 185, 10), #B7
+                (center[0] + 28, center[1] - 260, 10), #H7
+                (center[0] + 28, center[1] + 260, 10), #A7
+                # Row 6
+                (center[0] - 50, center[1] - 35, 10), #E6
+                (center[0] - 50, center[1] + 35, 10), #D6
+                (center[0] - 50, center[1] - 110, 10), #F6
+                (center[0] - 50, center[1] + 110, 10), #C6
+                (center[0] - 50, center[1] - 185, 10), #G6
+                (center[0] - 50, center[1] + 185, 10), #B6
+                (center[0] - 50, center[1] - 260, 10), #H6
+                (center[0] - 50, center[1] + 260, 10), #A6
+                # Row 5
+                (center[0] - 120, center[1] - 35, 10), #E5
+                (center[0] - 120, center[1] + 35, 10), #D5
+                (center[0] - 120, center[1] - 110, 10), #F5
+                (center[0] - 120, center[1] + 110, 10), #C5
+                (center[0] - 120, center[1] - 185, 8), #G5
+                (center[0] - 120, center[1] + 185, 8), #B5
+                (center[0] - 120, center[1] - 260, 8), #H5
+                (center[0] - 120, center[1] + 260, 8), #A5
+                # Row 4
+                (center[0] - 200, center[1] - 35, 10), #E4
+                (center[0] - 200, center[1] + 35, 10), #D4
+                (center[0] - 200, center[1] - 110, 10), #F4
+                (center[0] - 200, center[1] + 110, 10), #C4
+                (center[0] - 200, center[1] - 185, 8), #G4
+                (center[0] - 200, center[1] + 185, 8), #B4
+                (center[0] - 200, center[1] - 260, 8), #H4
+                (center[0] - 200, center[1] + 260, 8), #A4
+                # Row 3
+                (center[0] - 280, center[1] - 35, 10), #E3
+                (center[0] - 280, center[1] + 35, 10), #D3
+                (center[0] - 280, center[1] - 110, 10), #F3
+                (center[0] - 280, center[1] + 110, 10), #C3
+                (center[0] - 280, center[1] - 185, 8), #G3
+                (center[0] - 280, center[1] + 185, 8), #B3
+                (center[0] - 280, center[1] - 260, 8), #H3
+                (center[0] - 280, center[1] + 260, 8), #A3
+                # Row 2
+                (center[0] - 350, center[1] - 35, 9), #E2
+                (center[0] - 350, center[1] + 35, 9), #D2
+                (center[0] - 350, center[1] - 110, 9), #F2
+                (center[0] - 350, center[1] + 110, 9), #C2
+                (center[0] - 350, center[1] - 185, 8), #G2
+                (center[0] - 350, center[1] + 185, 8), #B2
+                (center[0] - 350, center[1] - 260, 8), #H2
+                (center[0] - 350, center[1] + 260, 8), #A2
+                # Row 1
+                (center[0] - 415, center[1] - 35, 9), #E1
+                (center[0] - 415, center[1] + 35, 9), #D1
+                (center[0] - 415, center[1] - 110, 9), #F1
+                (center[0] - 415, center[1] + 110, 9), #C1
+                (center[0] - 415, center[1] - 185, 8), #G1
+                (center[0] - 415, center[1] + 185, 8), #B1
+                (center[0] - 415, center[1] - 260, 6), #H1
+                (center[0] - 415, center[1] + 250, 6), #A1
+                # Row 8
+                (center[0] + 100, center[1] - 35, 10), #E8
+                (center[0] + 100, center[1] + 35, 10), #D8
+                (center[0] + 100, center[1] - 110, 10), #F8
+                (center[0] + 100, center[1] + 110, 10), #C8
+                (center[0] + 100, center[1] - 185, 8), #G8
+                (center[0] + 100, center[1] + 185, 8), #B8
+                (center[0] + 100, center[1] - 260, 8), #H8
+                (center[0] + 100, center[1] + 260, 8), #A8
+                # Row 9
+                (center[0] + 175, center[1] - 35, 10), #E9
+                (center[0] + 175, center[1] + 35, 10), #D9
+                (center[0] + 175, center[1] - 110, 10), #F9
+                (center[0] + 175, center[1] + 110, 10), #C9
+                (center[0] + 175, center[1] - 185, 8), #G9
+                (center[0] + 175, center[1] + 185, 8), #B9
+                (center[0] + 175, center[1] - 260, 8), #H9
+                (center[0] + 175, center[1] + 260, 8), #A9
+                # Row 10
+                (center[0] + 250, center[1] - 35, 10), #E10
+                (center[0] + 250, center[1] + 35, 10), #D10
+                (center[0] + 250, center[1] - 110, 10), #F10
+                (center[0] + 250, center[1] + 110, 10), #C10
+                (center[0] + 250, center[1] - 185, 8), #G10
+                (center[0] + 250, center[1] + 190, 8), #B10
+                (center[0] + 250, center[1] - 265, 8), #H10
+                (center[0] + 250, center[1] + 265, 8), #A10
+                # Row 11
+                (center[0] + 330, center[1] - 35, 9), #E11
+                (center[0] + 330, center[1] + 35, 9), #D11
+                (center[0] + 330, center[1] - 110, 9), #F11
+                (center[0] + 330, center[1] + 110, 9), #C11
+                (center[0] + 330, center[1] - 185, 8), #G11
+                (center[0] + 330, center[1] + 190, 8), #B11
+                (center[0] + 330, center[1] - 265, 8), #H11
+                (center[0] + 330, center[1] + 265, 8), #A11
+                # Row 12
+                (center[0] + 410, center[1] - 35, 9), #E12
+                (center[0] + 410, center[1] + 35, 9), #D12
+                (center[0] + 410, center[1] - 110, 9), #F12
+                (center[0] + 410, center[1] + 110, 9), #C12
+                (center[0] + 410, center[1] - 185, 8), #G12
+                (center[0] + 410, center[1] + 190, 8), #B12
+                (center[0] + 410, center[1] - 265, 6), #H12
+                (center[0] + 410, center[1] + 265, 6), #A12
+                ]
+        '''
+        return [ # Row 7
+                (center[1] - 35, center[0] + 28, 10), #E7
+                (center[1] + 35, center[0] + 28, 10), #D7
+                (center[1] - 110, center[0] + 28, 10), #F7
+                (center[1] + 110, center[0] + 28, 10), #C7
+                (center[1] - 185, center[0] + 28, 10), #G7
+                (center[1] + 185, center[0] + 28, 10), #B7
+                (center[1] - 260, center[0] + 28, 10), #H7
+                (center[1] + 260, center[0] + 28, 10), #A7
+                # Row 6
+                (center[1] - 35, center[0] - 50, 10), #E6
+                (center[1] + 35, center[0] - 50, 10), #D6
+                (center[1] - 110, center[0] - 50, 10), #F6
+                (center[1] + 110, center[0] - 50, 10), #C6
+                (center[1] - 185, center[0] - 50, 10), #G6
+                (center[1] + 185, center[0] - 50, 10), #B6
+                (center[1] - 260, center[0] - 50, 10), #H6
+                (center[1] + 260, center[0] - 50, 10), #A6
+                # Row 5
+                (center[1] - 35, center[0] - 120, 10), #E5
+                (center[1] + 35, center[0] - 120, 10), #D5
+                (center[1] - 110, center[0] - 120, 10), #F5
+                (center[1] + 110, center[0] - 120, 10), #C5
+                (center[1] - 185, center[0] - 120, 8), #G5
+                (center[1] + 185, center[0] - 120, 8), #B5
+                (center[1] - 260, center[0] - 120, 8), #H5
+                (center[1] + 260, center[0] - 120, 8), #A5
+                # Row 4
+                (center[1] - 35, center[0] - 200, 10), #E4
+                (center[1] + 35, center[0] - 200, 10), #D4
+                (center[1] - 110, center[0] - 200, 10), #F4
+                (center[1] + 110, center[0] - 200, 10), #C4
+                (center[1] - 185, center[0] - 200, 8), #G4
+                (center[1] + 185, center[0] - 200, 8), #B4
+                (center[1] - 260, center[0] - 200, 8), #H4
+                (center[1] + 260, center[0] - 200, 8), #A4
+                # Row 3
+                (center[1] - 35, center[0] - 280, 10), #E3
+                (center[1] + 35, center[0] - 280, 10), #D3
+                (center[1] - 110, center[0] - 280, 10), #F3
+                (center[1] + 110, center[0] - 280, 10), #C3
+                (center[1] - 185, center[0] - 280, 8), #G3
+                (center[1] + 185, center[0] - 280, 8), #B3
+                (center[1] - 260, center[0] - 280, 8), #H3
+                (center[1] + 260, center[0] - 280, 8), #A3
+                # Row 2
+                (center[1] - 35, center[0] - 350, 9), #E2
+                (center[1] + 35, center[0] - 350, 9), #D2
+                (center[1] - 110, center[0] - 350, 9), #F2
+                (center[1] + 110, center[0] - 350, 9), #C2
+                (center[1] - 185, center[0] - 350, 8), #G2
+                (center[1] + 185, center[0] - 350, 8), #B2
+                (center[1] - 260, center[0] - 350, 8), #H2
+                (center[1] + 260, center[0] - 350, 8), #A2
+                # Row 1
+                (center[1] - 35, center[0] - 415, 9), #E1
+                (center[1] + 35, center[0] - 415, 9), #D1
+                (center[1] - 110, center[0] - 415, 9), #F1
+                (center[1] + 110, center[0] - 415, 9), #C1
+                (center[1] - 185, center[0] - 415, 8), #G1
+                (center[1] + 185, center[0] - 415, 8), #B1
+                (center[1] - 260, center[0] - 415, 6), #H1
+                (center[1] + 250, center[0] - 415, 6), #A1
+                # Row 8
+                (center[1] - 35, center[0] + 100, 10), #E8
+                (center[1] + 35, center[0] + 100, 10), #D8
+                (center[1] - 110, center[0] + 100, 10), #F8
+                (center[1] + 110, center[0] + 100, 10), #C8
+                (center[1] - 185, center[0] + 100, 8), #G8
+                (center[1] + 185, center[0] + 100, 8), #B8
+                (center[1] - 260, center[0] + 100, 8), #H8
+                (center[1] + 260, center[0] + 100, 8), #A8
+                # Row 9
+                (center[1] - 35, center[0] + 175, 10), #E9
+                (center[1] + 35, center[0] + 175, 10), #D9
+                (center[1] - 110, center[0] + 175, 10), #F9
+                (center[1] + 110, center[0] + 175, 10), #C9
+                (center[1] - 185, center[0] + 175, 8), #G9
+                (center[1] + 185, center[0] + 175, 8), #B9
+                (center[1] - 260, center[0] + 175, 8), #H9
+                (center[1] + 260, center[0] + 175, 8), #A9
+                # Row 10
+                (center[1] - 35, center[0] + 250, 10), #E10
+                (center[1] + 35, center[0] + 250, 10), #D10
+                (center[1] - 110, center[0] + 250, 10), #F10
+                (center[1] + 110, center[0] + 250, 10), #C10
+                (center[1] - 185, center[0] + 250, 8), #G10
+                (center[1] + 190, center[0] + 250, 8), #B10
+                (center[1] - 265, center[0] + 250, 8), #H10
+                (center[1] + 265, center[0] + 250, 8), #A10
+                # Row 11
+                (center[1] - 35, center[0] + 330, 9), #E11
+                (center[1] + 35, center[0] + 330, 9), #D11
+                (center[1] - 110, center[0] + 330, 9), #F11
+                (center[1] + 110, center[0] + 330, 9), #C11
+                (center[1] - 185, center[0] + 330, 8), #G11
+                (center[1] + 190, center[0] + 330, 8), #B11
+                (center[1] - 265, center[0] + 330, 8), #H11
+                (center[1] + 265, center[0] + 330, 8), #A11
+                # Row 12
+                (center[1] - 35, center[0] + 410, 9), #E12
+                (center[1] + 35, center[0] + 410, 9), #D12
+                (center[1] - 110, center[0] + 410, 9), #F12
+                (center[1] + 110, center[0] + 410, 9), #C12
+                (center[1] - 185, center[0] + 410, 8), #G12
+                (center[1] + 190, center[0] + 410, 8), #B12
+                (center[1] - 265, center[0] + 410, 6), #H12
+                (center[1] + 265, center[0] + 410, 6), #A12
+                ]
+
+
+
+    # () -> New image with important pixels highlighted
+    # changes the pixel color of centers of the optimal parts of the vials and the color of four pixels around them based on the radius for testing the accuracy of get_vials
+    def draw_vials(self):
+        vials = self.get_vials()
+        image = self.image.copy()
+        for vial in vials:
+            # highlight pixel at center
+            image[vial[1]][vial[0]] = [0, 0, 255]
+            # also turn its neighboring pixels red for better visualization
+            image[vial[1]+1][vial[0]+1] = [0, 0, 255]
+            image[vial[1]+1][vial[0]] = [0, 0, 255]
+            image[vial[1]+1][vial[0]-1] = [0, 0, 255]
+            image[vial[1]][vial[0]+1] = [0, 0, 255]
+            image[vial[1]][vial[0]-1] = [0, 0, 255]
+            image[vial[1]-1][vial[0]+1] = [0, 0, 255]
+            image[vial[1]-1][vial[0]] = [0, 0, 255]
+            image[vial[1]-1][vial[0]-1] = [0, 0, 255]
+            # draw the corners of the square based on the radius in green
+            # highligh their neighbors are well for better visualization
+            top = vial[1]-vial[2]
+            bottom = vial[1]+vial[2]
+            left = vial[0]-vial[2]
+            right = vial[0]+vial[2]
+            # top left
+            image[top][left] = [0, 255, 0]
+            image[top+1][left+1] = [0, 255, 0]
+            image[top+1][left] = [0, 255, 0]
+            image[top+1][left-1] = [0, 255, 0]
+            image[top][left] = [0, 255, 0]
+            image[top][left] = [0, 255, 0]
+            image[top-1][left+1] = [0, 255, 0]
+            image[top-1][left] = [0, 255, 0]
+            image[top-1][left-1] = [0, 255, 0]
+
+            # top right
+            image[top][right] = [0, 255, 0]
+            image[top+1][right+1] = [0, 255, 0]
+            image[top+1][right] = [0, 255, 0]
+            image[top+1][right-1] = [0, 255, 0]
+            image[top][right] = [0, 255, 0]
+            image[top][right] = [0, 255, 0]
+            image[top-1][right+1] = [0, 255, 0]
+            image[top-1][right] = [0, 255, 0]
+            image[top-1][right-1] = [0, 255, 0]
+
+            # bottom left
+            image[bottom][left] = [0, 255, 0]
+            image[bottom+1][left+1] = [0, 255, 0]
+            image[bottom+1][left] = [0, 255, 0]
+            image[bottom+1][left-1] = [0, 255, 0]
+            image[bottom][left] = [0, 255, 0]
+            image[bottom][left] = [0, 255, 0]
+            image[bottom-1][left+1] = [0, 255, 0]
+            image[bottom-1][left] = [0, 255, 0]
+            image[bottom-1][left-1] = [0, 255, 0]
+
+            # bottom right
+            image[bottom][right] = [0, 255, 0]
+            image[bottom+1][right+1] = [0, 255, 0]
+            image[bottom+1][right] = [0, 255, 0]
+            image[bottom+1][right-1] = [0, 255, 0]
+            image[bottom][right] = [0, 255, 0]
+            image[bottom][right] = [0, 255, 0]
+            image[bottom-1][right+1] = [0, 255, 0]
+            image[bottom-1][right] = [0, 255, 0]
+            image[bottom-1][right-1] = [0, 255, 0]
+
+        cv2.imshow("Vial locations", imutils.resize(image, width=500))
+
     # () -> [[color]]
     # reads the colors of each vial on the plate
     # returns some data structure to demonstrate the array
@@ -204,6 +503,42 @@ class PlateImage:
                            pts[1][0]:pts[2][0]]
 
         return PlateImage(img_crop)
+
+    # calculates the dominant RGB value of a specified area on an image
+    # @param a tuple that contains the x-coordinate, y-coordinate, and radius of the location on the image
+    # @return a list containing the RGB values as a tuple and the location parameters as a tuple
+    def find_color(self, location):
+        image = self.image.copy()
+        x = location[0]
+        y = location[1]
+        radius = location[2]
+        cropped = image[(x - radius) : (x + radius), (y - radius) : (y + radius)]
+        cv2.imshow("Cropped", cropped)
+        cv2.waitKey(0)
+
+        NUM_CLUSTERS = 5
+        ar = np.asarray(cropped)
+        shape = ar.shape
+        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+
+        # assign codes and count occurrences
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)
+        counts, bins = np.histogram(vecs, len(codes))
+
+        # find most frequent
+        index_max = np.argmax(counts)
+        dominant_color = codes[index_max]
+
+        # formats to RGB tuple by rounding to int, reversing the list, and converting to tuple
+        dominant_color = tuple([int(round(num)) for num in dominant_color][::-1])
+
+        # might be simpler way to do it if we figure out how to instantiate ColorThief without file path
+        # color_thief = ColorThief(cropped)
+        # dominant_color = color_thief.get_color(quality=1)
+        # print(dominant_color)
+        return [dominant_color, location]
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
