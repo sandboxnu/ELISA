@@ -3,7 +3,6 @@ import imutils
 import cv2
 import numpy as np
 import scipy.cluster
-from colorthief import ColorThief
 
 # Represents an image of an ELISA plate
 class PlateImage:
@@ -46,21 +45,20 @@ class PlateImage:
         # copy the image and resize the copy
         image = self.image.copy()
 
-
         # define the coordinates of the corners of the image
         corner_offset = 25
         num_rows, num_cols, num_dims = image.shape
-        top_rows = range(corner_offset)
-        bot_rows = range((num_rows-corner_offset), num_rows)
-        left_cols = range(corner_offset)
+        top_rows   = range(corner_offset)
+        bot_rows   = range((num_rows-corner_offset), num_rows)
+        left_cols  = range(corner_offset)
         right_cols = range((num_cols-corner_offset), num_cols)
 
         # find the average color value of the pixels in a given corner of image
         # throw an error if they are lighter than the upperTresh
         def avg_color(rows, cols):
-            total_red = 0
+            total_red   = 0
             total_green = 0
-            total_blue = 0
+            total_blue  = 0
             for r in rows:
                 for c in cols:
                     total_red   += image[r, c][0]
@@ -216,10 +214,20 @@ class PlateImage:
 
     # () -> [[color]]
     # reads the colors of each vial on the plate
-    # returns some data structure to demonstrate the array
+    # returns some data structure to represent colors on array
     def get_colors(self):
-        raise "not yet implemented"
-    # TODO: maybe remove
+        try:
+            if self.is_blurry():
+                raise ValueError("Image was blurry!")
+            self.check_background()
+            img = self.normalize_shape() # 500w image
+            color_positions = [self.find_color(loc) for loc in self.get_vials()] # [()]
+
+          
+
+
+        except(ValueError):
+            raise ValueError("The image's background was not black!")
 
 
     # (maybe path) -> () (saves image)
