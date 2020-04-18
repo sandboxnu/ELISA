@@ -236,7 +236,7 @@ class PlateImage:
         cv2.imshow("Vial locations", imutils.resize(image, width=500))
 
 
-    # () -> [[color]]
+    # () -> [((r, g, b), (x, y, radius))]
     # reads the colors of each vial on the plate
     # returns some data structure to represent colors on array
     def get_colors(self):
@@ -244,22 +244,20 @@ class PlateImage:
             if self.is_blurry():
                 raise ValueError("Image was blurry!")
             self.check_background()
-            img = self.normalize_shape() # 500w image
-            color_positions = [self.find_color(loc) for loc in self.get_vials()] # [()]
-
-          
-
+            img = self.normalize_shape()  # 500w image
+            return [img.find_color(loc) for loc in img.get_vials()]  # [()]
 
         except(ValueError):
-            raise ValueError("The image's background was not black!")
+            raise ValueError("The image could not be read from. Please try again!")
 
 
-    # (maybe path) -> () (saves image)
+    # (maybe path) -> PlateImage
     # read the colors of the image and export image to paht
     def export_colors(self, path="."):
-        self.draw_img_data().save(path)
-        raise "not yet implemented"
-    # TODO: maybe remove
+        try:
+            return self.draw_img_data(self.get_colors())
+        except(ValueError):
+            raise ValueError("The image could not be read from. Please try again.")
 
 
     # () -> New cropped image
@@ -288,7 +286,7 @@ class PlateImage:
     # calculates the dominant RGB value of a specified area on an image
     # @param a tuple with x coord, y coord, and radius at (x,y)  on image
     # -- (x, y, radius)
-    # @return list with the RGB values and location parameters as tuples
+    # @return tuple with the RGB values and location parameters as tuples
     # -- ((r, g, b), (x, y, radius))
     def find_color(self, location):
 
@@ -318,7 +316,7 @@ class PlateImage:
         dominant_color = tuple(
             [int(round(num)) for num in dominant_color][::-1])
 
-        return [dominant_color, location]
+        return (dominant_color, location)
 
     # () -> () (mutates object)
     # normalize the colors of the image to improve color accuracy
@@ -351,16 +349,7 @@ class PlateImage:
     # draw rgb data on the image
     # () -> PlateImage
     # throws Exception if the image data is not realistic
-    def draw_img_data(self):
-        # label each vial with rgb
-
-        #      r, g, b
-        rgb = (1, 2, 3)
-        # row, col, pos
-        # ASSUME coordinates are from the bottom left corner of img
-        pos = (3, 2, 6)
-
-        inp = [(rgb, pos), (rgb, pos)]  # input format
+    def draw_img_data(self, img_data):
 
         # image display configuration
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -372,12 +361,12 @@ class PlateImage:
 
         # obtain relative colors list
         # ASSUME rel colors list is same length as abs colors list
-        rel_list = self.rel_to_abs_color([rgb for (rgb, pos) in inp])
+        rel_list = self.rel_to_abs_color([rgb for (rgb, pos) in img_data])
 
         if has_outliers(rel_list):
-            raise Exception("A color reading was too extreme to be realistic.")
+            raise ValueError("A color reading was too extreme to be realistic.")
 
-        for ((r, g, b), (x, y, rad)), rel in inp, rel_list:
+        for ((r, g, b), (x, y, rad)), rel in img_data, rel_list:
             cv2.putText(
                 img,
                 # prints (r, g, b):rel
