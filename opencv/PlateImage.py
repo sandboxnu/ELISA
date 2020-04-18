@@ -22,6 +22,10 @@ def find_outliers(data, thresh=3):
 
     return outliers
 
+# creates a PlateImage given a path
+def from_path(image_path):
+    return PlateImage(cv2.imread(image_path))
+
 # [('label, num)] -> bool
 # determines whether there are outliers in the data
 def has_outliers(data, thresh=3):
@@ -36,9 +40,8 @@ class PlateImage:
     # when adding parameters (such as thresholds),
     # these should be optional parameters for methods
     # ASSUME image is always scaled to have width of 700
-    # TODO: 500 or 700??
-    def __init__(self, image):
-        self.image = imutils.resize(image, width=700)
+    def __init__(self, img):
+        self.image = imutils.resize(img, width=700)
 
     # creates a PlateImage given a path
     def from_path(self, image_path):
@@ -94,7 +97,7 @@ class PlateImage:
 
             # check to see if each component of the rgb value is darker than
             # upper boundary, otherwise throw an error
-            for avg_color, thresh in avg, upper_thresh:
+            for avg_color, thresh in zip(avg, upper_thresh):
                 if avg_color > thresh:
                     raise ValueError("Background must be black.")
 
@@ -243,7 +246,7 @@ class PlateImage:
         try:
             if self.is_blurry():
                 raise ValueError("Image was blurry!")
-            self.check_background()
+            # self.check_background()
             img = self.normalize_shape()  # 500w image
             return [img.find_color(loc) for loc in img.get_vials()]  # [()]
 
@@ -279,6 +282,8 @@ class PlateImage:
 
         # crop
         img_crop = img_rot[pts[1][1]:pts[0][1], pts[1][0]:pts[2][0]]
+
+        print(img_crop)
 
         return PlateImage(img_crop)
 
@@ -353,9 +358,9 @@ class PlateImage:
 
         # image display configuration
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1       # scale of the font
-        color = (0, 255, 0)  # red
-        thickness = 2        # line thickness
+        font_scale = 0.2       # scale of the font
+        color = (0, 0, 255)  # red
+        thickness = 1        # line thickness
 
         img = self.image.copy()
 
@@ -363,14 +368,17 @@ class PlateImage:
         # ASSUME rel colors list is same length as abs colors list
         rel_list = self.rel_to_abs_color([rgb for (rgb, pos) in img_data])
 
-        if has_outliers(rel_list):
-            raise ValueError("A color reading was too extreme to be realistic.")
+        # if has_outliers(rel_list):
+            # raise ValueError("A color reading was too extreme to be realistic.")
 
-        for ((r, g, b), (x, y, rad)), rel in img_data, rel_list:
+        for ((r, g, b), (x, y, rad)), rel in zip(img_data, rel_list):
+            printstr = "({:07.3f}, {:07.3f}, {:07.3f}):{:07.3f}".format(r, g, b, rel)
+            print(printstr)
+
             cv2.putText(
                 img,
                 # prints (r, g, b):rel
-                "({:07.3f}, {:07.3f}, {:07.3f}):{:07.3f}".format(r, g, b, rel),
+                printstr,
                 (x, y),
                 font,
                 font_scale,
