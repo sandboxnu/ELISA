@@ -280,10 +280,8 @@ class PlateImage:
         pts = np.int0(cv2.transform(np.array([box]), m))[0]
         pts[pts < 0] = 0
 
-        # crop
+        # crop the image based on the corners found
         img_crop = img_rot[pts[1][1]:pts[0][1], pts[1][0]:pts[2][0]]
-
-        print(img_crop)
 
         return PlateImage(img_crop)
 
@@ -295,16 +293,18 @@ class PlateImage:
     # -- ((r, g, b), (x, y, radius))
     def find_color(self, location):
 
-        image = self.image.copy()
+        image = imutils.resize(self.image.copy(), 700)
         x, y, radius = location
         cropped = image[(x - radius):(x + radius), (y - radius):(y + radius)]
-        cv2.imshow("Cropped", cropped)
-        cv2.waitKey(0)
+        # cv2.imshow("Cropped", cropped)
+        # cv2.waitKey(0)
 
         NUM_CLUSTERS = 5
         ar = np.asarray(cropped)
         shape = ar.shape
         ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+        print(ar)
+        print(NUM_CLUSTERS)
 
         codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
 
@@ -338,12 +338,6 @@ class PlateImage:
     # () -> ()
     def show(self):
         cv2.imshow("ELISA Plate", self.image)
-
-    # get the rgb data of colors in vials on the image
-    # () -> PlateImage
-    def get_img_data(self):
-        img = self.image.copy()
-        return PlateImage(img)
 
     # converts a list of relative colors to a list of abs colors
     # [(r,g,b)] -> [0...1]
