@@ -296,13 +296,13 @@ class PlateImage:
         image = imutils.resize(self.image.copy(), 700)
         x, y, radius = location
         cropped = image[(x - radius):(x + radius), (y - radius):(y + radius)]
-        # cv2.imshow("Cropped", cropped)
-        # cv2.waitKey(0)
 
         NUM_CLUSTERS = 5
         ar = np.asarray(cropped)
         shape = ar.shape
         ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+
+        # TODO: bug is here
         print(ar)
         print(NUM_CLUSTERS)
 
