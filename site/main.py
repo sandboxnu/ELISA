@@ -70,7 +70,7 @@ def upload_file():
                 try:
                     image.normalize_shape().draw_contours().save(path=upload_location)
 
-                    return render_template('crop.html', filename=filename, image=upload_location)
+                    return render_template('upload.html', filename=filename)
                 except:
                     message = 'The image could not be read from. Please try again.'
                     return redirect(url_for('error_message', error=message))
@@ -78,7 +78,7 @@ def upload_file():
                 message = 'The image was too blurry to be read from. Please adjust the blurriness criteria or upload a new image.'
                 return redirect(url_for('error_message', message=message))
 
-    return render_template('index.html')
+    return render_template('crop.html')
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

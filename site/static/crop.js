@@ -1,25 +1,6 @@
 // vars
-// on change show image with crop options
-const make_img = function(image) {
-    // create new image
-    let img = document.createElement('img');
-    img.id = 'image';
-    img.src = image;
-    img.alt = 'Could not find image.';
+window.onload = function() {
 
-    console.log('the image was found');
-    // clean result before
-    result.innerHTML = '';
-    // append new image
-    result.appendChild(img);
-    // show save btn and options
-    save.classList.remove('hide');
-    options.classList.remove('hide');
-    // init cropper
-    cropper = new Cropper(img);
- }
-
-const startup = function(img) {
     let result = document.querySelector('.result'),
     img_result = document.querySelector('.img-result'),
     img_w = document.querySelector('.img-w'),
@@ -31,24 +12,64 @@ const startup = function(img) {
     upload = document.querySelector('#file-input'),
     cropper = '';
 
-    make_img(img);
+    // on change show image with crop options
+    upload.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            // start file reader
+            const reader = new FileReader();
+            reader.onload = (e)=> {
+                if(e.target.result){
+                    // create new image
+                    let img = document.createElement('img');
+                    img.id = 'image';
+                    img.src = e.target.result
+                    // clean result before
+                    result.innerHTML = '';
+                    // append new image
+                    result.appendChild(img);
+                    // show save btn and options
+                    save.classList.remove('hide');
+                    options.classList.remove('hide');
+                    // init cropper
+                    cropper = new Cropper(img);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
 
-        // save on click
-    save.addEventListener('click',(e)=>{
-      e.preventDefault();
+    // save on click
+    save.addEventListener('click',(e) => {
+        e.preventDefault();
       // get result to data uri
-      let imgSrc = cropper.getCroppedCanvas({
+        let imgSrc = cropper.getCroppedCanvas( {
             width: img_w.value // input value
         }).toDataURL();
-      // remove hide class of img
-      cropped.classList.remove('hide');
-      img_result.classList.remove('hide');
+        // remove hide class of img
+        cropped.classList.remove('hide');
+        img_result.classList.remove('hide');
         // show image cropped
-      cropped.src = imgSrc;
-      dwn.classList.remove('hide');
-      dwn.download = 'imagename.png';
-      dwn.setAttribute('href',imgSrc);
+        cropped.src = imgSrc;
+        filename = 'plate.png';
+        dwn.classList.remove('hide');
+        dwn.download = 'imagename.png';
+        dwn.setAttribute('href',imgSrc);
+
+        // The rest of this code assumes you are not using a library.
+          // It can be made less wordy if you use one.
+//        const form = document.createElement('form');
+//        form.method = 'POST';
+//        form.action = '/';
+//
+//        const hiddenField = document.createElement('input');
+//        hiddenField.type = 'hidden';
+//        hiddenField.name = 'file';
+//        hiddenField.value = cropped.src;
+//
+//        form.appendChild(hiddenField);
+//
+//        document.body.appendChild(form);
+//        form.submit();
     });
 
 }
-
