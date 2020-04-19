@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 
 
-UPLOAD_FOLDER = 'images'
+UPLOAD_FOLDER = 'static'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -70,7 +70,7 @@ def upload_file():
                 try:
                     image.normalize_shape().draw_contours().save(path=upload_location)
 
-                    return render_template('upload.html', filename=filename)
+                    return render_template('crop.html', filename=filename, image=upload_location)
                 except:
                     message = 'The image could not be read from. Please try again.'
                     return redirect(url_for('error_message', error=message))
@@ -82,7 +82,7 @@ def upload_file():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory("images", filename)
+    return send_from_directory("static", filename)
 
 @app.route('/error/<message>')
 def error_message(message):
@@ -92,4 +92,4 @@ def error_message(message):
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="127.0.0.1", port=80)

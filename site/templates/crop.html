@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+
+<link  href="/static/cropper.css" rel="stylesheet">
+<script src="/static/cropper.js"></script>
+
+<link rel="stylesheet" href='/static/style.css' />
+{% if image %}
+<script type="text/javascript" src="/static/crop.js"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        img ='{{image}}';
+    }
+</script>
+<script type="text/javascript">
+    startup(img);
+</script>
+{% endif %}
+
+
+<main class="page">
+    <h2>Upload a picture of an ELISA Plate to get the color readings.</h2>
+    <!-- leftbox -->
+    <div class="box-2">
+        <div class="result"></div>
+    </div>
+    <!--rightbox-->
+    <div class="box-2 img-result hide">
+        <!-- result of crop -->
+        <img class="cropped" src="" alt="">
+    </div>
+    <!-- input file -->
+    <div class="box">
+        <div class="options hide">
+            <label> Width</label>
+            <input type="number" class="img-w" value="300" min="100" max="1200" />
+        </div>
+        <!-- save btn -->
+        <button class="btn save hide">Save</button>
+        <!-- download btn -->
+        <a href="" class="btn download hide">Download</a>
+    </div>
+</main>
+{% endblock %}
