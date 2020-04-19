@@ -403,7 +403,7 @@ class PlateImage:
 
     # (maybe path) -> ()
     # writes the image to disk at provided path
-    def save(self, path="./"):
+    def save(self, path="./image.jpeg"):
         cv2.imwrite(path, self.image)
 
     # displays image through opencv
