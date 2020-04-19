@@ -203,40 +203,106 @@ class PlateImage:
         vials = self.get_vials()
         image = self.image.copy()
 
-        RED = [0, 0, 255]
-        GREEN = [0, 255, 0]
-        pos_offsets = [-1, 0, 1]
+        # image = imutils.resize(image, width=700)
 
         for vial in vials:
             # highlight pixel at center
-            image[vial[1]][vial[0]] = RED
-
-            for x_off in pos_offsets:
-                for y_off in pos_offsets:
-                    # also turn its neighboring pixels red
-                    # for better visualization
-                    image[vial[1]+x_off][vial[0]+y_off] = RED
-
+            image[vial[1]][vial[0]] = [0, 0, 255]
+            # also turn its neighboring pixels red for better visualization
+            image[vial[1]+1][vial[0]+1] = [0, 0, 255]
+            image[vial[1]+1][vial[0]] = [0, 0, 255]
+            image[vial[1]+1][vial[0]-1] = [0, 0, 255]
+            image[vial[1]][vial[0]+1] = [0, 0, 255]
+            image[vial[1]][vial[0]-1] = [0, 0, 255]
+            image[vial[1]-1][vial[0]+1] = [0, 0, 255]
+            image[vial[1]-1][vial[0]] = [0, 0, 255]
+            image[vial[1]-1][vial[0]-1] = [0, 0, 255]
             # draw the corners of the square based on the radius in green
-            # highlight their neighbors are well for better visualization
-            top    = vial[1]-vial[2]
+            # highligh their neighbors are well for better visualization
+            top = vial[1]-vial[2]
             bottom = vial[1]+vial[2]
-            left   = vial[0]-vial[2]
-            right  = vial[0]+vial[2]
-
-            # locations of the four corners
-            corner_locs = [(top, left),
-                           (top, right),
-                           (bottom, left),
-                           (bottom, right)]
-
+            left = vial[0]-vial[2]
+            right = vial[0]+vial[2]
             # top left
-            for x_loc, y_loc in corner_locs:
-                for x_off in pos_offsets:
-                    for y_off in pos_offsets:
-                        image[x_loc + x_off][y_loc + y_off] = GREEN
+            image[top][left] = [0, 255, 0]
+            image[top+1][left+1] = [0, 255, 0]
+            image[top+1][left] = [0, 255, 0]
+            image[top+1][left-1] = [0, 255, 0]
+            image[top][left] = [0, 255, 0]
+            image[top][left] = [0, 255, 0]
+            image[top-1][left+1] = [0, 255, 0]
+            image[top-1][left] = [0, 255, 0]
+            image[top-1][left-1] = [0, 255, 0]
 
-        cv2.imshow("Vial locations", imutils.resize(image, width=500))
+            # top right
+            image[top][right] = [0, 255, 0]
+            image[top+1][right+1] = [0, 255, 0]
+            image[top+1][right] = [0, 255, 0]
+            image[top+1][right-1] = [0, 255, 0]
+            image[top][right] = [0, 255, 0]
+            image[top][right] = [0, 255, 0]
+            image[top-1][right+1] = [0, 255, 0]
+            image[top-1][right] = [0, 255, 0]
+            image[top-1][right-1] = [0, 255, 0]
+
+            # bottom left
+            image[bottom][left] = [0, 255, 0]
+            image[bottom+1][left+1] = [0, 255, 0]
+            image[bottom+1][left] = [0, 255, 0]
+            image[bottom+1][left-1] = [0, 255, 0]
+            image[bottom][left] = [0, 255, 0]
+            image[bottom][left] = [0, 255, 0]
+            image[bottom-1][left+1] = [0, 255, 0]
+            image[bottom-1][left] = [0, 255, 0]
+            image[bottom-1][left-1] = [0, 255, 0]
+
+            # bottom right
+            image[bottom][right] = [0, 255, 0]
+            image[bottom+1][right+1] = [0, 255, 0]
+            image[bottom+1][right] = [0, 255, 0]
+            image[bottom+1][right-1] = [0, 255, 0]
+            image[bottom][right] = [0, 255, 0]
+            image[bottom][right] = [0, 255, 0]
+            image[bottom-1][right+1] = [0, 255, 0]
+            image[bottom-1][right] = [0, 255, 0]
+            image[bottom-1][right-1] = [0, 255, 0]
+
+            cv2.imshow("Vial locations", imutils.resize(image, width=500))
+
+        # RED = [0, 0, 255]
+        # GREEN = [0, 255, 0]
+        # pos_offsets = [-1, 0, 1]
+#
+        # for vial in vials:
+            # # highlight pixel at center
+            # image[vial[1]][vial[0]] = RED
+#
+            # for x_off in pos_offsets:
+                # for y_off in pos_offsets:
+                    # # also turn its neighboring pixels red
+                    # # for better visualization
+                    # image[vial[1]+x_off][vial[0]+y_off] = RED
+#
+            # # draw the corners of the square based on the radius in green
+            # # highlight their neighbors are well for better visualization
+            # top    = vial[1]-vial[2]
+            # bottom = vial[1]+vial[2]
+            # left   = vial[0]-vial[2]
+            # right  = vial[0]+vial[2]
+#
+            # # locations of the four corners
+            # corner_locs = [(top, left),
+                           # (top, right),
+                           # (bottom, left),
+                           # (bottom, right)]
+#
+            # # top left
+            # for x_loc, y_loc in corner_locs:
+                # for x_off in pos_offsets:
+                    # for y_off in pos_offsets:
+                        # image[x_loc + x_off][y_loc + y_off] = GREEN
+#
+        # cv2.imshow("Vial locations", imutils.resize(image, width=700))
 
 
     # () -> [((r, g, b), (x, y, radius))]
@@ -292,10 +358,16 @@ class PlateImage:
     # @return tuple with the RGB values and location parameters as tuples
     # -- ((r, g, b), (x, y, radius))
     def find_color(self, location):
+        print("finding the color...")
 
-        image = imutils.resize(self.image.copy(), 700)
+        image = imutils.resize(self.image.copy(), 710)
         x, y, radius = location
         cropped = image[(x - radius):(x + radius), (y - radius):(y + radius)]
+
+        print(x)
+        print(y)
+        print(radius)
+        print(cropped)
 
         NUM_CLUSTERS = 5
         ar = np.asarray(cropped)
@@ -331,7 +403,7 @@ class PlateImage:
 
     # (maybe path) -> ()
     # writes the image to disk at provided path
-    def save(self, path="."):
+    def save(self, path="./"):
         cv2.imwrite(path, self.image)
 
     # displays image through opencv
