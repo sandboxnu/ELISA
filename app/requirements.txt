@@ -10,7 +10,7 @@ Kivy-examples==2.0.0rc1
 Kivy-Garden==0.1.4
 kiwisolver==1.1.0
 matplotlib==3.1.2
-numpy==1.18.1
+numpy==1.22.0
 opencv-python==4.1.2.30
 Pygments==2.7.4
 pyparsing==2.4.6
